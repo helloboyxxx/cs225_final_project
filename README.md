@@ -2,5 +2,12 @@
 UIUC fall 2023 cs225 final project repository
 
 
-Hangman english dictionary database:
-https://github.com/harshnative/words-dataset.git
+OpenFlight datasets:
+https://openflights.org/data.html
+
+
+### Team members:
+Ellen Yang, yaweny2
+Encheng Xie, encheng2 
+Ruijia Lyu, ruijial3
+Yue Chen, yuec12
