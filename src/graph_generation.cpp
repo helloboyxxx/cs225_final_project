@@ -1,7 +1,4 @@
 #include "graph_generation.h"
-#include "structures.h"
-#include <fstream>
-#include <stdexcept>
 
 std::unordered_map<std::string, airport> Generator::readFromFile(std::string airport_filename, std::string route_filename) {
     std::fstream airport_file(airport_filename);
