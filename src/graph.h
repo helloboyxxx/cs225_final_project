@@ -7,9 +7,6 @@
 
 using std::string;
 using std::vector;
-using std::cout;
-using std::endl;
-
 
 class Graph {
   public:
@@ -51,7 +48,7 @@ class Graph {
     /*
     key: airport's IATA, value: its corresponding airport struct
     */
-    std::unordered_map<string, airport> airport_map;
+    std::unordered_map<string, Airport> airport_map;
 
     /**
      * Returns whether thee route from source to dest exists in the graph
