@@ -12,7 +12,7 @@ class Graph {
   public:
 
     // Default constructor that creates an empty graph
-    Graph();
+    Graph() = default;
 
     // Given two file names, this constructor calls graph_generation to help generate the airport_map
     Graph(string airport_filename, string route_filename);
@@ -65,5 +65,11 @@ class Graph {
      * @param functionName - the name of the calling function to return
      */
     bool assertAirportExists(string& IATA, string functionName) const;
+
+    /**
+     * Prints error message with noticeable color
+     * @param message - the error message that should be printed
+     */
+    void printError(string message) const;
 
 };
