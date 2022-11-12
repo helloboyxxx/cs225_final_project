@@ -7,15 +7,12 @@
 
 using std::string;
 using std::vector;
-using std::cout;
-using std::endl;
-
 
 class Graph {
   public:
 
     // Default constructor that creates an empty graph
-    Graph();
+    Graph() = default;
 
     // Given two file names, this constructor calls graph_generation to help generate the airport_map
     Graph(string airport_filename, string route_filename);
@@ -51,7 +48,7 @@ class Graph {
     /*
     key: airport's IATA, value: its corresponding airport struct
     */
-    std::unordered_map<string, airport> airport_map;
+    std::unordered_map<string, Airport> airport_map;
 
     /**
      * Returns whether thee route from source to dest exists in the graph
@@ -68,5 +65,11 @@ class Graph {
      * @param functionName - the name of the calling function to return
      */
     bool assertAirportExists(string& IATA, string functionName) const;
+
+    /**
+     * Prints error message with noticeable color
+     * @param message - the error message that should be printed
+     */
+    void printError(string message) const;
 
 };
