@@ -6,14 +6,15 @@
 
 
 /**
- * This is a struct that holds route information of each airport, including airline name and distance of travel
+ * This is a struct that holds route information of each airport, including number of flights and distance of travel
 */
-struct route {
-    route(std::string a, double d) {
-        airline = a;
-        distance = d;
+struct Route {
+    Route() {}
+    Route(double distance) {
+        num_flight = 1;
+        this->distance = distance;
     }
-    std::string airline;
+    unsigned num_flight = 0;
     double distance;
 };
 
@@ -21,9 +22,10 @@ struct route {
  * This is a struct that holds all the information requried for an airport.
  * It also includes the information about the edge (maybe?).
 */
-struct airport {
+struct Airport {
     // 3-letter IATA code
-    airport(std::string _IATA, std::string _city, std::string _country, double _lo, double _la, double _al) {
+    Airport() {}
+    Airport(std::string _IATA, std::string _city, std::string _country, double _lo, double _la, double _al) {
         IATA = _IATA;
         city = _city;
         country = _country;
@@ -54,5 +56,5 @@ struct airport {
     /**
     * Key: IATA of adjacent airports, value: distance of this route
     */
-    std::unordered_map< std::string, route> adjacent_airport;
+    std::unordered_map< std::string, Route> adjacent_airport;
 };
