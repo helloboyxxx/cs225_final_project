@@ -1,6 +1,7 @@
 #include "graph_generation.h"
 #include "structures.h"
 #include <cmath>
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <sstream>
 #include <string>
@@ -100,4 +101,26 @@ std::unordered_map<std::string, Airport> Generator::readFromFile(std::string air
 double Generator::distance_between(Airport a, Airport b) {
     double d = pow(a.altitude - b.altitude, 2) + pow(a.longitude - b.longitude, 2) + pow(a.latitude - b.latitude, 2);
     return std::sqrt(d);
+}
+
+#include <math.h>
+
+double calculateDistance(double lat1, double long1, double lat2, double long2) {
+    double dlat1 = toRadians(lat1);
+    double dlat2 = toRadians(lat2);
+
+    double latDist = dlat2 - dlat1;
+    double longDist = toRadians(long2 - long1);
+
+    // Radius of the Earth in km
+    double R = 6378.1;
+
+    double distance = pow(sin(latDist / 2), 2) + cos(dlat1) * cos(dlat2) * pow(sin(longDist / 2), 2);
+    distance = 2 * R * asin(sqrt(distance));
+
+    return distance;
+}
+
+double toRadians(const double degree) {
+    return degree * M_PI / 180;
 }
