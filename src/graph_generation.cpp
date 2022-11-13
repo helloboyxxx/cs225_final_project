@@ -1,4 +1,5 @@
 #include "graph_generation.h"
+#include <math.h>
 
 std::unordered_map<std::string, airport> Generator::readFromFile(std::string airport_filename, std::string route_filename) {
     std::fstream airport_file(airport_filename);
@@ -38,4 +39,24 @@ std::unordered_map<std::string, airport> Generator::readFromFile(std::string air
     }
 
     return map;
+}
+
+double calculateDistance(double lat1, double long1, double lat2, double long2) {
+    double dlat1 = toRadians(lat1);
+    double dlat2 = toRadians(lat2);
+
+    double latDist = dlat2 - dlat1;
+    double longDist = toRadians(long2 - long1);
+
+    // Radius of the Earth in km
+    double R = 6378.1;
+
+    double distance = pow(sin(latDist / 2), 2) + cos(dlat1) * cos(dlat2) * pow(sin(longDist / 2), 2);
+    distance = 2 * R * asin(sqrt(distance));
+
+    return distance;
+}
+
+double toRadians(const double degree) {
+    return degree * M_PI / 180;
 }
