@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "graph_generation.h"
+#include "structures.h"
 #include <string>
 
 using std::cout;
@@ -17,7 +18,7 @@ vector<string> Graph::getAllAiports() const {
   return airports;
 }
 
-vector<string> Graph::getAdjacentAirports(string& IATA) const {
+vector<string> Graph::getAdjacentAirports(string IATA) const {
   if (assertAirportExists(IATA, __func__) == false) {
     return vector<string>();
   }
@@ -32,7 +33,7 @@ vector<string> Graph::getAdjacentAirports(string& IATA) const {
 }
 
 
-double Graph::getDistance(string& source, string& dest) const {
+double Graph::getDistance(string source, string dest) const {
   // Use these three lines when debugging. (Since it is easier to understand.)
   // I included the optimized version below. Uncomment to run. 
   if ( assertRouteExists(source, dest, __func__) == false ) { return -1; }
@@ -62,8 +63,45 @@ double Graph::getDistance(string& source, string& dest) const {
 }
 
 
+void Graph::insertAirport(Airport a) {
+  removeAirport(a.IATA);    // overwrite old stuff
+  airport_map[a.IATA] = a;  // Insert the airport we want
+}
 
-bool Graph::assertRouteExists(string& source, string& dest, string functionName) const {
+void Graph::removeAirport(string IATA) {
+  if (airport_map.find(IATA) != airport_map.end()) {
+    airport_map.erase(IATA);  // erase the airport
+    // run a loop and remove all the routes that points to this airport
+    for (auto it = airport_map.begin(); it != airport_map.end(); ++it) {
+      auto& adj_airport = it->second.adjacent_airport;
+      if (adj_airport.find(IATA) != adj_airport.end()) {
+        adj_airport.erase(IATA);
+      }
+    }
+  }
+}
+
+
+bool Graph::insertRoute(string source, string dest, double distance) {
+  if ( assertAirportExists(source, __func__) == false || 
+  assertAirportExists(dest, __func__) == false )
+  {
+    printError("insertRoute error");
+    return false;
+  }
+  airport_map[source].adjacent_airport[dest] = Route(distance);
+  return true;
+}
+
+void Graph::removeRoute(string source, string dest) {
+  assertRouteExists(source, dest, __func__);
+  airport_map[source].adjacent_airport.erase(dest);
+}
+
+
+
+
+bool Graph::assertRouteExists(string source, string dest, string functionName) const {
   if (assertAirportExists(source, functionName) == false ||
       assertAirportExists(dest, functionName) == false) {
         // Let the assertAirportExists report the error message
@@ -79,7 +117,7 @@ bool Graph::assertRouteExists(string& source, string& dest, string functionName)
   return true;
 }
 
-bool Graph::assertAirportExists(string& IATA, string functionName) const {
+bool Graph::assertAirportExists(string IATA, string functionName) const {
   if (airport_map.find(IATA) == airport_map.end()) {
     if (functionName != "") {
       string message = "The airport " + IATA +
