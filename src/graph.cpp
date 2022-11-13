@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "graph_generation.h"
+#include "structures.h"
 #include <string>
 
 using std::cout;
@@ -60,6 +61,41 @@ double Graph::getDistance(string source, string dest) const {
   // // Here we must have a route from source to dest
   // return dest_it->second.distance;
 }
+
+
+void Graph::insertAirport(Airport a) {
+  removeAirport(a.IATA);    // overwrite old stuff
+  airport_map[a.IATA] = a;  // Insert the airport we want
+}
+
+void Graph::removeAirport(string IATA) {
+  if (airport_map.find(IATA) != airport_map.end()) {
+    airport_map.erase(IATA);  // erase the airport
+    // run a loop and remove all the routes that points to this airport
+    for (auto it = airport_map.begin(); it != airport_map.end(); ++it) {
+      auto& adj_airport = it->second.adjacent_airport;
+      if (adj_airport.find(IATA) != adj_airport.end()) {
+        adj_airport.erase(IATA);
+      }
+    }
+  }
+}
+
+
+bool Graph::insertRoute(string source, string dest, double distance) {
+  if ( assertRouteExists(source, dest, __func__) == true ) {
+    // route already exist
+    return false;
+  }
+  airport_map[source].adjacent_airport[dest] = Route(distance);
+  return true;
+}
+
+void Graph::removeRoute(string source, string dest) {
+  assertRouteExists(source, dest, __func__);
+  airport_map[source].adjacent_airport.erase(dest);
+}
+
 
 
 

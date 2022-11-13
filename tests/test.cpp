@@ -3,6 +3,7 @@
 #include <string>
 
 #include "graph.h"
+#include "structures.h"
 
 
 TEST_CASE("Empty graph return proper messages") {
@@ -13,4 +14,46 @@ TEST_CASE("Empty graph return proper messages") {
   REQUIRE( empty_graph.getAllAiports().empty() );
   REQUIRE(empty_graph.getAdjacentAirports(source).empty());
   REQUIRE(empty_graph.getDistance(source, dest) < 0);
+}
+
+
+TEST_CASE("Insert a single airport") {
+  Graph g;
+  // 3830,"Chicago O'Hare International Airport","Chicago","United States","ORD","KORD",41.9786,-87.9048,672,-6,"A","America/Chicago","airport","OurAirports"
+  Airport a("ORD", "Chicago", "United States", 41.9786, -87.9048, 672);
+  g.insertAirport(a);
+  REQUIRE(g.getAllAiports().size() == 1);
+  REQUIRE(g.getAllAiports().at(0) == "ORD");
+  REQUIRE(g.getAdjacentAirports("ORD").empty());
+}
+
+TEST_CASE("Insert and remove one airport") {
+  Graph g;
+  // 3830,"Chicago O'Hare International Airport","Chicago","United States","ORD","KORD",41.9786,-87.9048,672,-6,"A","America/Chicago","airport","OurAirports"
+  Airport a("ORD", "Chicago", "United States", 41.9786, -87.9048, 672);
+  g.insertAirport(a);
+  g.removeAirport("ORD");
+  REQUIRE(g.getAllAiports().empty());
+  REQUIRE(g.empty());
+}
+
+TEST_CASE("Insert two airports and one edge") {
+  Graph g;
+  // 3830,"Chicago O'Hare International Airport","Chicago","United States","ORD","KORD",41.9786,-87.9048,672,-6,"A","America/Chicago","airport","OurAirports"
+  // 3877,"McCarran International Airport","Las Vegas","United States","LAS","KLAS",36.08010101,-115.1520004,2181,-8,"A","America/Los_Angeles","airport","OurAirports"
+  Airport a("ORD", "Chicago", "United States", 41.9786, -87.9048, 672);
+  Airport b("LAS", "Las Vegas", "United States", 36.08010101, -115.1520004, 2181);
+
+  double distance = 1;  // formula for calculating distance is required
+  REQUIRE(g.getAdjacentAirports("ORD").empty());    // Graph error since airport doesn't exist
+
+  g.insertAirport(a);
+  g.insertAirport(b);
+
+  REQUIRE(g.insertRoute("ORD", "LAS", distance));   // Graph error since route doesn't exist
+
+  REQUIRE(g.getAdjacentAirports("ORD").size() == 1);
+  REQUIRE(g.getAdjacentAirports("ORD").at(0) == "LAS");
+  REQUIRE(g.getAdjacentAirports("LAS").empty());
+  REQUIRE(g.getAllAiports().size() == 2);
 }

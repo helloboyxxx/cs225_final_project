@@ -44,6 +44,45 @@ class Graph {
 
 
 
+    /**
+    Inserts a new airport into the graph.
+    This function will overwrite if old stuff was there
+    */
+    void insertAirport(Airport a);
+
+    /**
+    Removes a given airport from the graph.
+    This function should also remove all the routes that are 
+    connected to this airport.
+    */
+    void removeAirport(string IATA);
+
+
+    /**
+     * Inserts an route between two airports.
+     * Hence, an error is not thrown when it fails to insert an route.
+     * In this function we assume that both source and dest exists. 
+     * We will assert this before proceeding the rest of our program. 
+     * @param source - source airport IATA 
+     * @param dest - destination airport IATA
+     * @return whether inserting the route was successful. Return false
+     * if the route already exist
+     */
+    bool insertRoute(string source, string dest, double distance);
+
+
+    /**
+     * Removes the route between two airports
+     * @param source - source airport IATA
+     * @param dest - destination airport IATA
+     */
+    void removeRoute(string source, string dest);
+
+
+    // Return true if this grpah is empty. 
+    bool empty() const { return airport_map.empty(); }
+
+
   private:
     /*
     key: airport's IATA, value: its corresponding airport struct
