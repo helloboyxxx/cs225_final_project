@@ -17,7 +17,7 @@ vector<string> Graph::getAllAiports() const {
   return airports;
 }
 
-vector<string> Graph::getAdjacentAirports(string& IATA) const {
+vector<string> Graph::getAdjacentAirports(string IATA) const {
   if (assertAirportExists(IATA, __func__) == false) {
     return vector<string>();
   }
@@ -32,7 +32,7 @@ vector<string> Graph::getAdjacentAirports(string& IATA) const {
 }
 
 
-double Graph::getDistance(string& source, string& dest) const {
+double Graph::getDistance(string source, string dest) const {
   // Use these three lines when debugging. (Since it is easier to understand.)
   // I included the optimized version below. Uncomment to run. 
   if ( assertRouteExists(source, dest, __func__) == false ) { return -1; }
@@ -63,7 +63,7 @@ double Graph::getDistance(string& source, string& dest) const {
 
 
 
-bool Graph::assertRouteExists(string& source, string& dest, string functionName) const {
+bool Graph::assertRouteExists(string source, string dest, string functionName) const {
   if (assertAirportExists(source, functionName) == false ||
       assertAirportExists(dest, functionName) == false) {
         // Let the assertAirportExists report the error message
@@ -79,7 +79,7 @@ bool Graph::assertRouteExists(string& source, string& dest, string functionName)
   return true;
 }
 
-bool Graph::assertAirportExists(string& IATA, string functionName) const {
+bool Graph::assertAirportExists(string IATA, string functionName) const {
   if (airport_map.find(IATA) == airport_map.end()) {
     if (functionName != "") {
       string message = "The airport " + IATA +

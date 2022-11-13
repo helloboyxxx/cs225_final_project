@@ -25,7 +25,7 @@ class Graph {
     * If the given IATA is not in the graph, we return an empty vector.
     * Assume that this is a connected graph.
     */
-    vector<string> getAdjacentAirports(string& IATA) const;
+    vector<string> getAdjacentAirports(string IATA) const;
 
     /*
     Return all the airports in this graph as a vector of their IATAs.
@@ -40,7 +40,7 @@ class Graph {
     @param dest, the IATA of the destination airport
     @returns the distance between two airports.
     */
-    double getDistance(string& source, string& dest) const;
+    double getDistance(string source, string dest) const;
 
 
 
@@ -56,7 +56,7 @@ class Graph {
      * @param dest - another airport
      * @param functionName - the name of the calling function to return
      */
-    bool assertRouteExists(string& source, string& dest, string functionName) const;
+    bool assertRouteExists(string source, string dest, string functionName) const;
 
 
     /**
@@ -64,7 +64,7 @@ class Graph {
      * @param IATA - IATA of an airport
      * @param functionName - the name of the calling function to return
      */
-    bool assertAirportExists(string& IATA, string functionName) const;
+    bool assertAirportExists(string IATA, string functionName) const;
 
     /**
      * Prints error message with noticeable color
