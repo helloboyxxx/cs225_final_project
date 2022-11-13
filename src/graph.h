@@ -82,6 +82,28 @@ class Graph {
     // Return true if this grpah is empty. 
     bool empty() const { return airport_map.empty(); }
 
+    /**
+    Given the source and destination airports' IATA, this function returns a
+    vector of strings that represents all the airports in that path. We will not
+    include the source airport but we will include the dest in this path.
+    @param source source airport IATA
+    @param dest destination airport IATA
+    @returns a vector of IATA that represents the path
+    */
+    vector<string> shortestPath(string source, string dest);
+
+
+    /**
+    Given the source airport, this function will use Dijkstra's algorithm to calculate
+    the shortest paths from source to all other airports. This is a helper function for both 
+    shortestPath and betweenness centrality algorithms. 
+    Paths in the returned vector has no priority. Each path's destination can be access by looking 
+    up the last element in the path. So each path contains at least one element.
+    @param source source airport IATA
+    @returns a vector of paths. Each path will not include source airport but will include dest
+    */
+    vector<vector<string>> allShortestPath(string source);
+
 
   private:
     /*
