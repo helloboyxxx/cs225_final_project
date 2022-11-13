@@ -83,8 +83,10 @@ void Graph::removeAirport(string IATA) {
 
 
 bool Graph::insertRoute(string source, string dest, double distance) {
-  if ( assertRouteExists(source, dest, __func__) == true ) {
-    // route already exist
+  if ( assertAirportExists(source, __func__) == false || 
+  assertAirportExists(dest, __func__) == false )
+  {
+    printError("insertRoute error");
     return false;
   }
   airport_map[source].adjacent_airport[dest] = Route(distance);
