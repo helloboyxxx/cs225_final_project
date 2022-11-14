@@ -105,6 +105,11 @@ class Graph {
     vector<vector<string>> allShortestPath(string source);
 
 
+    /**
+    Given a starting airport IATA, this function return all the airports' IATA in BFS order.
+    */
+    vector<string> BFS(string source) const;
+
   private:
     /*
     key: airport's IATA, value: its corresponding airport struct
