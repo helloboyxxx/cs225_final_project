@@ -159,6 +159,30 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
       }
     }
   }
+vector<string> Graph::BFS(string source) const {
+  if (assertAirportExists(source, __func__) == false ) {
+    return vector<string>(); 
+  }
+  vector<string> output;
+  std::unordered_set<string> visited;
+  std::queue<string> Q;
+  Q.push(source);
+  visited.insert(source);
+
+  while( !Q.empty() ) {
+    string cur_airport = Q.front();
+    Q.pop();
+    output.push_back(cur_airport);
+    vector<string> adj = getAdjacentAirports(cur_airport);
+    for (string a : adj) {
+      // Not adding visited airport
+      if (visited.find(a) == visited.end()) {
+        Q.push(a);
+        visited.insert(a);
+      }
+    }
+  }
+  return output;
 }
 
 bool Graph::assertRouteExists(string source, string dest, string functionName) const {
