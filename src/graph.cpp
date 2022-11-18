@@ -159,6 +159,7 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
       }
     }
   }
+}
 vector<string> Graph::BFS(string source) const {
   if (assertAirportExists(source, __func__) == false ) {
     return vector<string>(); 
