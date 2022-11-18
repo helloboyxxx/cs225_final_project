@@ -137,14 +137,14 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
 
   // initialize priority_queue.
   std::priority_queue< disPair, vector<disPair>, std::greater<disPair> > Q;
-  for (auto dist : distances) {
-    Q.push({dist.second, dist.first});    // {double distance, string IATA}
-  }
+  Q.push({0, source});
   
   // Dijkstra starts
   while ( !Q.empty() ) {
     string cur_airport = Q.top().second;
     Q.pop();
+    if (visited.find(cur_airport) != visited.end())
+      continue;
     visited.insert(cur_airport);
     
     // Loop through the neighbors of this airport
@@ -156,6 +156,9 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
       if (cur_distance + distances[cur_airport] < distances[neighbor]) {
         distances[neighbor] = cur_distance + distances[cur_airport];
         previous[neighbor] = cur_airport;
+
+        // update the priority queue with neighbor and its new distance.
+        Q.push({distances[neighbor], neighbor});
       }
     }
   }
