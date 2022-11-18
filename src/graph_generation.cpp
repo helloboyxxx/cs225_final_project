@@ -1,6 +1,8 @@
 #include "graph_generation.h"
 #include "structures.h"
 #include <cmath>
+#include <fstream>
+#include <ostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <sstream>
@@ -88,22 +90,34 @@ std::unordered_map<std::string, Airport> Generator::readFromFile(std::string air
 
     //@TODO
     //erase airports (vertex) that has no flight in and out
-
-    //@TODO
-    //update frequency for each airport (centrality)
-
-    //@TODO
-    //Based on frequency, choose edges that would produce Eulerian Path
-
+    for (auto it : map) {
+        if (it.second.route_in == 0 && it.second.route_out == 0) {
+            map.erase(it.first);
+        }
+    }
     return map;
+}
+
+void writeToFile(std::string filename, std::unordered_map<std::string, Airport> map) {
+    //create file
+    std::fstream file;
+    file.open(filename);
+    file << "-Country~City~Departure Airport  --Destination Airport~~~distance between \n" << std::endl;
+
+    for (auto it : map) {
+        Airport airport = it.second;
+        file << airport.country<<" - "<< airport.city<<" - "<<it.first<<std::endl;
+        for (auto des : airport.adjacent_airport) {
+            file<<"        "<<des.first<<" ~~~ "<<des.second.distance<<std::endl;
+        }
+    }
+    file.close();
 }
 
 double Generator::distance_between(Airport a, Airport b) {
     double d = pow(a.altitude - b.altitude, 2) + pow(a.longitude - b.longitude, 2) + pow(a.latitude - b.latitude, 2);
     return std::sqrt(d);
 }
-
-#include <math.h>
 
 double calculateDistance(double lat1, double long1, double lat2, double long2) {
     double dlat1 = toRadians(lat1);
