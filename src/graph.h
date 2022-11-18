@@ -30,7 +30,7 @@ class Graph {
     /*
     Return all the airports in this graph as a vector of their IATAs.
     */
-    vector<string> getAllAiports() const;
+    vector<string> getAllAirports() const;
     
 
     /**
@@ -41,7 +41,6 @@ class Graph {
     @returns the distance between two airports.
     */
     double getDistance(string source, string dest) const;
-
 
 
     /**
@@ -84,25 +83,24 @@ class Graph {
 
     /**
     Given the source and destination airports' IATA, this function returns a
-    vector of strings that represents all the airports in that path. We will not
-    include the source airport but we will include the dest in this path.
+    vector of strings that represents all the airports in that path. We will
+    include both the source airport and the dest in this path.
     @param source source airport IATA
     @param dest destination airport IATA
     @returns a vector of IATA that represents the path
     */
-    vector<string> shortestPath(string source, string dest);
-
+    vector<string> shortestPath(string source, string dest) const;
 
     /**
-    Given the source airport, this function will use Dijkstra's algorithm to calculate
-    the shortest paths from source to all other airports. This is a helper function for both 
-    shortestPath and betweenness centrality algorithms. 
-    Paths in the returned vector has no priority. Each path's destination can be access by looking 
-    up the last element in the path. So each path contains at least one element.
+    Given the source airport, this function will use Dijkstra's algorithm to
+    calculate the shortest paths from source to all other airports. This is a
+    helper function for both shortestPath and betweenness centrality algorithms.
+    Paths in the returned vector has no priority. Each path contains at least
+    two elements.
     @param source source airport IATA
-    @returns a vector of paths. Each path will not include source airport but will include dest
+    @returns a vector of paths. We will include both the source and the dest in paths.
     */
-    vector<vector<string>> allShortestPath(string source);
+    vector<vector<string>> allShortestPath(string source) const;
 
 
     /**
@@ -111,6 +109,25 @@ class Graph {
     vector<string> BFS(string source) const;
 
   private:
+
+    /**
+    Given the source airport, this function will use Dijkstra's algorithm to calculate 
+    the the parent of every airport. This can then be used for both shortest path functions
+    @param source source airport IATA
+    @param previous a reference to the previous map. key: current IATA, value: parent IATA
+    */
+    void calcPrevious(string source, std::unordered_map<string, string>& previous) const;
+
+
+    /**
+    Given the destination IATA and the previous map, this function returns a shortest path from 
+    source to dest. This is a helper function for both shortest path functions. 
+    @param source source airport IATA
+    @param dest destination airport IATA
+    @param previous a reference to the previous map. key: current IATA, value: parent IATA
+    */
+    vector<string> calcPath(string source, string dest, std::unordered_map<string, string>& previous) const;
+
     /*
     key: airport's IATA, value: its corresponding airport struct
     */

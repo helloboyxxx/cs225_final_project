@@ -1,18 +1,28 @@
 #include "graph.h"
 #include "graph_generation.h"
 #include "structures.h"
+#include <cfloat>
 #include <string>
+#include <unordered_map>
+#include <limits>
 #include <queue>
 #include <unordered_set>
 
 using std::cout;
 using std::endl;
 
+/*
+double distance, string IATA. Used in calcPrevious
+Distance placed in the front since
+operator> in std::pair will compare the first element by defaut */
+typedef std::pair<double, string> disPair;
+
+
 Graph::Graph(string airport_filename, string route_filename) {
   airport_map = Generator::readFromFile(airport_filename, route_filename);
 }
 
-vector<string> Graph::getAllAiports() const {
+vector<string> Graph::getAllAirports() const {
   vector<string> airports;
   for (auto &airport : airport_map) {
     airports.push_back(airport.first);
@@ -101,6 +111,54 @@ void Graph::removeRoute(string source, string dest) {
 }
 
 
+vector<string> Graph::shortestPath(string source, string dest) const {
+  return vector<string>();
+}
+
+vector<vector<string>> Graph::allShortestPath(string source) const {
+  return vector<vector<string>>();
+}
+
+void Graph::calcPrevious(string source, std::unordered_map<string, string>& previous) const {
+  previous.clear();
+  // stores airport IATA that has been visited before
+  std::unordered_set<string> visited; 
+  // key: current IATA, value: shortest total distance from source to current
+  std::unordered_map<string, double> distances;
+
+  // Initialize both distance and previous
+  for (const auto& airport : airport_map) {
+    string IATA = airport.first;
+    distances[IATA] = DBL_MAX;    // create a disPair and insert into distance graph
+    previous[IATA] = "";
+  }
+  // Set distance of source to zero
+  distances[source] = 0;
+
+  // initialize priority_queue.
+  std::priority_queue< disPair, vector<disPair>, std::greater<disPair> > Q;
+  for (auto dist : distances) {
+    Q.push({dist.second, dist.first});    // {double distance, string IATA}
+  }
+  
+  // Dijkstra starts
+  while ( !Q.empty() ) {
+    string cur_airport = Q.top().second;
+    Q.pop();
+    visited.insert(cur_airport);
+    
+    // Loop through the neighbors of this airport
+    for (auto neighbor : getAdjacentAirports(cur_airport)) {
+      if (visited.find(neighbor) != visited.end())
+        continue;   // skip when visited this airport before
+      
+      double cur_distance = getDistance(cur_airport, neighbor);
+      if (cur_distance + distances[cur_airport] < distances[neighbor]) {
+        distances[neighbor] = cur_distance + distances[cur_airport];
+        previous[neighbor] = cur_airport;
+      }
+    }
+  }
 vector<string> Graph::BFS(string source) const {
   if (assertAirportExists(source, __func__) == false ) {
     return vector<string>(); 
@@ -133,6 +191,7 @@ bool Graph::assertRouteExists(string source, string dest, string functionName) c
         // Let the assertAirportExists report the error message
         return false;
   }
+  std::priority_queue<disPair, vector<disPair>, std::greater<disPair>> Q;
   const Airport& source_a = airport_map.find(source)->second;   // source_a is the Airport struct of the given source
   if (source_a.adjacent_airport.find(dest) == source_a.adjacent_airport.end()) {
     string message = "The route from " + source + " to " + dest +
@@ -154,7 +213,6 @@ bool Graph::assertAirportExists(string IATA, string functionName) const {
   }
   return true;
 }
-
 
 void Graph::printError(string message) const
 {
