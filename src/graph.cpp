@@ -7,6 +7,7 @@
 #include <limits>
 #include <queue>
 #include <unordered_set>
+#include <algorithm>
 
 using std::cout;
 using std::endl;
@@ -112,11 +113,66 @@ void Graph::removeRoute(string source, string dest) {
 
 
 vector<string> Graph::shortestPath(string source, string dest) const {
-  return vector<string>();
+  // check if both source and dest is included in the graph
+  if (!assertAirportExists(source, "shortestPath") || !assertAirportExists(dest, "shortestPath"))
+    return vector<string>();
+
+  //check if dest is not the same as source
+  if (source == dest) 
+    return vector<string>();
+
+  vector<string> path;
+
+  // create the previous map for finding the path using calcPrevious.
+  std::unordered_map<string, string> previous;
+  calcPrevious(source, previous);
+
+  path.push_back(dest);
+  string prev = previous[dest];
+  while (prev != "") {
+    path.push_back(prev);
+    prev = previous[prev];
+  }
+  // reverse to change the order to (start with source and end with dest)
+  std::reverse(path.begin(), path.end());
+
+  return path;
 }
 
 vector<vector<string>> Graph::allShortestPath(string source) const {
-  return vector<vector<string>>();
+  // check if source is included in the graph
+  if (!assertAirportExists(source, "allShortestPath"))
+    return vector<vector<string>>();
+
+
+  vector<vector<string>> to_return;
+
+  // create the previous map for finding the path using calcPrevious.
+  std::unordered_map<string, string> previous;
+  calcPrevious(source, previous);
+
+  // Iterate through all airports to find its shortest path to source airport
+  for (const auto& cur_airport : getAllAirports()) {
+    // source won't have a path to itself in this case
+    if (cur_airport == source)
+      continue;
+    
+    // find path from cur_airport to source
+    vector<string> path;
+    path.push_back(cur_airport);
+    string prev = previous[cur_airport];
+
+    while (prev != "") {
+      path.push_back(prev);
+      prev = previous[prev];
+    }
+
+    // reverse to change the order to (start with source and end with cur_airport)
+    std::reverse(path.begin(), path.end());
+    to_return.push_back(path);
+  }
+  
+  return to_return;
 }
 
 void Graph::calcPrevious(string source, std::unordered_map<string, string>& previous) const {
