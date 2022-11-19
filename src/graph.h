@@ -85,6 +85,10 @@ class Graph {
     Given the source and destination airports' IATA, this function returns a
     vector of strings that represents all the airports in that path. We will
     include both the source airport and the dest in this path.
+    
+    Function will return an empty vector if either of source or dest is not 
+    included in graph or if dest is the same as source.
+
     @param source source airport IATA
     @param dest destination airport IATA
     @returns a vector of IATA that represents the path
@@ -94,9 +98,11 @@ class Graph {
     /**
     Given the source airport, this function will use Dijkstra's algorithm to
     calculate the shortest paths from source to all other airports. This is a
-    helper function for both shortestPath and betweenness centrality algorithms.
+    helper function for betweenness centrality algorithms.
     Paths in the returned vector has no priority. Each path contains at least
     two elements.
+    The function will return an empty vector if the given source airport 
+    is not inlucded in the graph.
     @param source source airport IATA
     @returns a vector of paths. We will include both the source and the dest in paths.
     */
