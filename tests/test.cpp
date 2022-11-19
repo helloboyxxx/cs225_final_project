@@ -5,6 +5,7 @@
 #include <queue>
 #include <utility>
 #include <vector>
+#include <set>
 
 #include "graph.h"
 #include "structures.h"
@@ -114,7 +115,6 @@ TEST_CASE("Test Distance struct") {
   Q.pop();
   cout << Q.top().second << ": " << Q.top().first << endl;
   Q.pop();
-  REQUIRE(g.getAllAiports().size() == 2);
 }
 
 TEST_CASE("BFS test 1") {
@@ -131,4 +131,87 @@ TEST_CASE("BFS test 2") {
     std::cout << airport << " ";
   }
   std::cout << std::endl;
+}
+
+TEST_CASE("Test Shortest path 1") {
+  Graph g;
+  smallCase(g);
+  vector<string> shortest_path = {"ORD", "LAS"};
+  REQUIRE(g.shortestPath("ORD", "LAS").size() == 2);
+  REQUIRE(g.shortestPath("ORD", "LAS") == shortest_path);
+}
+
+TEST_CASE("Test Shortest path 2") {
+  Graph g;
+  smallCase(g);
+  vector<string> shortest_path = {"LAS", "MDW", "ORD"};
+  REQUIRE(g.shortestPath("LAS", "ORD").size() == 3);
+  REQUIRE(g.shortestPath("LAS", "ORD") == shortest_path);
+}
+
+TEST_CASE("Test Shortest path 3") {
+  Graph g;
+  smallCase(g);
+  vector<string> shortest_path = {"HKG", "BOS"};
+  REQUIRE(g.shortestPath("HKG", "BOS").size() == 2);
+  REQUIRE(g.shortestPath("HKG", "BOS") == shortest_path);
+}
+
+TEST_CASE("Test Shortest path 4") {
+  Graph g;
+  smallCase(g);
+  vector<string> shortest_path = {"LAS", "SAN", "LHR", "BOS"};
+  REQUIRE(g.shortestPath("LAS", "BOS").size() == 4);
+  REQUIRE(g.shortestPath("LAS", "BOS") == shortest_path);
+}
+
+TEST_CASE("Test All shortest path") {
+  Graph s;
+  smallCase(s);
+  string source = "ORD";
+
+  vector<string> b = {source, "LAS"};
+  vector<string> c = {source, "LAS", "SAN"};
+  vector<string> d = {source, "LAS", "MDW"};
+  vector<string> e = {source, "LAS", "SAN", "LHR", "BOS"};
+  vector<string> f = {source, "HKG"};
+  vector<string> g = {source, "HKG", "SZX"};
+  vector<string> h = {source, "LAS", "SAN", "LHR"};
+
+  vector<vector<string>> result = s.allShortestPath(source);
+  REQUIRE(result.size() == 7);
+
+  std::set<vector<string>> shortest_paths;
+  for (vector<string> path: result) {
+    shortest_paths.insert(path);
+  }
+
+  auto posB = shortest_paths.find(b);
+  if (posB == shortest_paths.end()) {
+    std::cout << "B's Not Present" << std::endl;
+  }
+  auto posC = shortest_paths.find(b);
+  if (posC == shortest_paths.end()) {
+    std::cout << "C's Not Present" << std::endl;
+  }
+  auto posD = shortest_paths.find(b);
+  if (posD == shortest_paths.end()) {
+    std::cout << "D's Not Present" << std::endl;
+  }
+  auto posE = shortest_paths.find(b);
+  if (posE == shortest_paths.end()) {
+    std::cout << "E's Not Present" << std::endl;
+  }
+  auto posF = shortest_paths.find(b);
+  if (posF == shortest_paths.end()) {
+    std::cout << "F's Not Present" << std::endl;
+  }
+  auto posG = shortest_paths.find(b);
+  if (posG == shortest_paths.end()) {
+    std::cout << "G's Not Present" << std::endl;
+  }
+  auto posH = shortest_paths.find(b);
+  if (posH == shortest_paths.end()) {
+    std::cout << "H's Not Present" << std::endl;
+  }
 }
