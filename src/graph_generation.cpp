@@ -22,11 +22,33 @@ std::unordered_map<std::string, Airport> Generator::readFromFile(std::string air
     std::string line;
     while (std::getline(airport_file, line)) {
         std::vector<std::string> info;
-        std::string each_info;
-        std::stringstream ss(line);
-        while (getline(ss, each_info, ',')) {
-            info.push_back(each_info);
+        // std::string each_info;
+        // std::stringstream ss(line);
+        // while (getline(ss, each_info, ',')) {
+        //     info.push_back(each_info);
+        // }
+
+        std::string data = "";
+        bool start = false;
+        for (std::string::iterator c = line.begin(); c != line.end(); c++) {
+            if (*c == ',' && start == false) {
+                info.push_back(data);
+                data.clear();
+                continue;
+            }
+            if (data.empty() && *c == '"') {
+                start = true;
+                continue;
+            }
+            if (start && *c == '"') {
+                start = false;
+                info.push_back(data);
+                data.clear();
+                continue;
+            }
+            data += *c;
         }
+
         // each info contains the following info in order:
         // 0: Airport ID 
         // 1: Name 
