@@ -20,7 +20,9 @@ typedef std::pair<double, string> disPair;
 
 
 Graph::Graph(string airport_filename, string route_filename) {
-  airport_map = Generator::readFromFile(airport_filename, route_filename);
+  airport_map = std::unordered_map<std::string, Airport>();
+  Generator::readFromFile(airport_filename, route_filename, airport_map);
+
 }
 
 vector<string> Graph::getAllAirports() const {
