@@ -9,45 +9,44 @@
 #include <string>
 #include <vector>
 
-std::unordered_map<std::string, Airport> Generator::readFromFile(std::string airport_filename, std::string route_filename) {
+void Generator::readFromFile(std::string airport_filename, std::string route_filename, std::unordered_map<std::string, Airport>& map) {
     std::fstream airport_file(airport_filename);
     std::fstream route_file(route_filename);
     if (!airport_file.is_open() || !route_file.is_open()) {
         throw std::runtime_error("invalid file");
     }
-    //initialize the output map
-    std::unordered_map<std::string, Airport> map;
 
     // generate all vertex (airport)
     std::string line;
     while (std::getline(airport_file, line)) {
         std::vector<std::string> info;
-        // std::string each_info;
-        // std::stringstream ss(line);
-        // while (getline(ss, each_info, ',')) {
-        //     info.push_back(each_info);
-        // }
-
-        std::string data = "";
-        bool start = false;
-        for (std::string::iterator c = line.begin(); c != line.end(); c++) {
-            if (*c == ',' && start == false) {
-                info.push_back(data);
-                data.clear();
-                continue;
-            }
-            if (data.empty() && *c == '"') {
-                start = true;
-                continue;
-            }
-            if (start && *c == '"') {
-                start = false;
-                info.push_back(data);
-                data.clear();
-                continue;
-            }
-            data += *c;
+        std::string each_info;
+        std::stringstream ss(line);
+        while (getline(ss, each_info, ',')) {
+            info.push_back(each_info);
         }
+        if (info.size() != 14) continue;
+        // std::string data = "";
+        // bool start = false;
+        // for (std::string::iterator c = line.begin(); c != line.end(); c++) {
+        //     if (*c == ',' && start == false) {
+        //         if (data.empty()) continue;
+        //         info.push_back(data);
+        //         data.clear();
+        //         continue;
+        //     }
+        //     if (data.empty() && *c == '"') {
+        //         start = true;
+        //         continue;
+        //     }
+        //     if (start && *c == '"') {
+        //         start = false;
+        //         info.push_back(data);
+        //         data.clear();
+        //         continue;
+        //     }
+        //     data += *c;
+        // }
 
         // each info contains the following info in order:
         // 0: Airport ID 
@@ -64,10 +63,14 @@ std::unordered_map<std::string, Airport> Generator::readFromFile(std::string air
         // 11: Tz database time zone
         // 12: Type
         // 13: Source
-        Airport ap(info[4], info[2], info[3], std::stod(info[7]), std::stod(info[6]), std::stod(info[8]));
-        map[info[4]] = ap;
+        Airport ap(
+            info[4].substr(1, (info[4]).size() - 2),    
+            info[2].substr(1, (info[2]).size() - 2), 
+            info[3].substr(1, (info[3]).size() - 2),
+            std::stod(info[7]), std::stod(info[6]), std::stod(info[8]));
+        map[info[4].substr(1, (info[4]).size() - 2)] = ap;
     }
-
+    
     // generate all edge (route)
     while (std::getline(route_file, line)) {
         std::vector<std::string> info;
@@ -109,15 +112,15 @@ std::unordered_map<std::string, Airport> Generator::readFromFile(std::string air
             departure.adjacent_airport[info[4]].num_flight += 1;
         }
     }
-
-    //@TODO
-    //erase airports (vertex) that has no flight in and out
-    for (auto it : map) {
-        if (it.second.route_in == 0 && it.second.route_out == 0) {
-            map.erase(it.first);
+    auto it = map.begin();
+    while (it != map.end()) {
+        if (it->second.route_in == 0 && it->second.route_out == 0) {
+            map.erase(it++);
+        } else {
+            ++it;
         }
     }
-    return map;
+
 }
 
 void writeToFile(std::string filename, std::unordered_map<std::string, Airport> map) {
