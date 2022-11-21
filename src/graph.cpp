@@ -8,9 +8,11 @@
 #include <queue>
 #include <unordered_set>
 #include <algorithm>
+#include <chrono>
 
 using std::cout;
 using std::endl;
+using namespace std::chrono;
 
 /*
 double distance, string IATA. Used in calcPrevious
@@ -48,33 +50,41 @@ vector<string> Graph::getAdjacentAirports(string IATA) const {
 }
 
 
+void Graph::getAdjacentTest(string IATA, vector<string> airports) const {
+  const Airport& A = airport_map.find(IATA)->second;    // A is the Airport struct of the given source
+  for (auto &airport : A.adjacent_airport) {
+    airports.push_back(airport.first);
+  }
+}
+
 double Graph::getDistance(string source, string dest) const {
-  // Use these three lines when debugging. (Since it is easier to understand.)
-  // I included the optimized version below. Uncomment to run. 
-  if ( assertRouteExists(source, dest, __func__) == false ) { return -1; }
-  const Airport& source_a =  airport_map.find(source)->second;  // source_a is the Airport struct of the given source
-  return source_a.adjacent_airport.find(dest)->second.distance; // find the adjacent airport's route and return distance from it
+  // // Use these three lines when debugging. (Since it is easier to understand.)
+  // // I included the optimized version below. Uncomment to run. 
+  // if ( assertRouteExists(source, dest, __func__) == false ) { return -1; }
+  // const Airport& source_a =  airport_map.find(source)->second;  // source_a is the Airport struct of the given source
+  // return source_a.adjacent_airport.find(dest)->second.distance; // find the adjacent airport's route and return distance from it
 
-  // // Optimized version bellow:
-  // const auto& source_it = airport_map.find(source);   // iterator that points to the source in airport_map
-  // // Check if the given sources exists
-  // if (source_it == airport_map.end()) {
-  //   cout << "The airport " << source << " is not included in the graph." << endl;
-  //   return -1;
-  // } else if (airport_map.find(dest) == airport_map.end()) {
-  //   cout << "The airport " << dest << " is not included in the graph." << endl;
-  //   return -1;
-  // }
 
-  // // iterator that points to the dest in the adjacent_airport. Reminder: value is a Route struct
-  // const auto& dest_it = source_it->second.adjacent_airport.find(dest); 
-  // if (dest_it == source_it->second.adjacent_airport.end()) {
-  //   cout << "The route from " << source << " to " << dest << " is not included in the graph.";
-  //   return -1;
-  // } 
+  // Optimized version bellow:
+  const auto& source_it = airport_map.find(source);   // iterator that points to the source in airport_map
+  // Check if the given sources exists
+  if (source_it == airport_map.end()) {
+    cout << "The airport " << source << " is not included in the graph." << endl;
+    return -1;
+  } else if (airport_map.find(dest) == airport_map.end()) {
+    cout << "The airport " << dest << " is not included in the graph." << endl;
+    return -1;
+  }
 
-  // // Here we must have a route from source to dest
-  // return dest_it->second.distance;
+  // iterator that points to the dest in the adjacent_airport. Reminder: value is a Route struct
+  const auto& dest_it = source_it->second.adjacent_airport.find(dest); 
+  if (dest_it == source_it->second.adjacent_airport.end()) {
+    cout << "The route from " << source << " to " << dest << " is not included in the graph.";
+    return -1;
+  } 
+
+  // Here we must have a route from source to dest
+  return dest_it->second.distance;
 }
 
 
@@ -197,6 +207,8 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
   std::priority_queue< disPair, vector<disPair>, std::greater<disPair> > Q;
   Q.push({0, source});
   
+  unsigned count = 0;
+  auto start = high_resolution_clock::now();
   // Dijkstra starts
   while ( !Q.empty() ) {
     string cur_airport = Q.top().second;
@@ -205,6 +217,7 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
       continue;
     visited.insert(cur_airport);
     
+    ++count;
     // Loop through the neighbors of this airport
     for (auto neighbor : getAdjacentAirports(cur_airport)) {
       if (visited.find(neighbor) != visited.end())
@@ -220,7 +233,12 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
       }
     }
   }
+  auto end = high_resolution_clock::now();
+  auto duration = duration_cast<milliseconds>(end - start);
+  cout << "Dijkstra duration: "<< duration.count() << " milliseconds" << endl;
+  cout << "COUNT: " << count << endl;
 }
+
 vector<string> Graph::BFS(string source) const {
   if (assertAirportExists(source, __func__) == false ) {
     return vector<string>(); 
@@ -279,4 +297,31 @@ bool Graph::assertAirportExists(string IATA, string functionName) const {
 void Graph::printError(string message) const
 {
     std::cerr << "\033[1;31m[Graph Error]\033[0m " + message << endl;
+}
+
+bool Graph::assertRouteExists(string source, string dest) const {
+  // if (assertAirportExists(source, functionName) == false ||
+  //     assertAirportExists(dest, functionName) == false) {
+  //       // Let the assertAirportExists report the error message
+  //       return false;
+  // }
+  std::priority_queue<disPair, vector<disPair>, std::greater<disPair>> Q;
+  const Airport& source_a = airport_map.find(source)->second;   // source_a is the Airport struct of the given source
+  if (source_a.adjacent_airport.find(dest) == source_a.adjacent_airport.end()) {
+    string message = "The route from " + source + " to " + dest +
+                 " is not included in the graph.";
+    printError(message);
+    return false;
+  }
+  return true;
+}
+
+bool Graph::assertAirportExists(string IATA) const {
+  if (airport_map.find(IATA) == airport_map.end()) {
+    string message = "The airport " + IATA +
+                      " is not included in the graph.";
+    printError(message);
+    return false;
+  }
+  return true;
 }
