@@ -50,13 +50,6 @@ vector<string> Graph::getAdjacentAirports(string IATA) const {
 }
 
 
-void Graph::getAdjacentTest(string IATA, vector<string> airports) const {
-  const Airport& A = airport_map.find(IATA)->second;    // A is the Airport struct of the given source
-  for (auto &airport : A.adjacent_airport) {
-    airports.push_back(airport.first);
-  }
-}
-
 double Graph::getDistance(string source, string dest) const {
   // // Use these three lines when debugging. (Since it is easier to understand.)
   // // I included the optimized version below. Uncomment to run. 
@@ -207,8 +200,6 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
   std::priority_queue< disPair, vector<disPair>, std::greater<disPair> > Q;
   Q.push({0, source});
   
-  unsigned count = 0;
-  auto start = high_resolution_clock::now();
   // Dijkstra starts
   while ( !Q.empty() ) {
     string cur_airport = Q.top().second;
@@ -217,7 +208,6 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
       continue;
     visited.insert(cur_airport);
     
-    ++count;
     // Loop through the neighbors of this airport
     for (auto neighbor : getAdjacentAirports(cur_airport)) {
       if (visited.find(neighbor) != visited.end())
@@ -233,10 +223,6 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
       }
     }
   }
-  auto end = high_resolution_clock::now();
-  auto duration = duration_cast<milliseconds>(end - start);
-  cout << "Dijkstra duration: "<< duration.count() << " milliseconds" << endl;
-  cout << "COUNT: " << count << endl;
 }
 
 vector<string> Graph::BFS(string source) const {

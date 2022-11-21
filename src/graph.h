@@ -118,8 +118,8 @@ class Graph {
     vector<string> BFS(string source) const;
 
     bool assertRouteExists(string source, string dest) const;
-    bool assertAirportExists(string IATA) const;
 
+    bool assertAirportExists(string IATA) const;
   private:
 
     /**
