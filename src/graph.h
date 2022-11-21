@@ -27,6 +27,9 @@ class Graph {
     */
     vector<string> getAdjacentAirports(string IATA) const;
 
+    // const vector<string> & getAdjacentTest(string IATA) const;
+    void getAdjacentTest(string IATA, vector<string> airports ) const;
+
     /*
     Return all the airports in this graph as a vector of their IATAs.
     */
@@ -113,6 +116,9 @@ class Graph {
     Given a starting airport IATA, this function return all the airports' IATA in BFS order.
     */
     vector<string> BFS(string source) const;
+
+    bool assertRouteExists(string source, string dest) const;
+    bool assertAirportExists(string IATA) const;
 
   private:
 
