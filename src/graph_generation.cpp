@@ -1,13 +1,10 @@
 #include "graph_generation.h"
 #include "structures.h"
-#include <cmath>
 #include <fstream>
 #include <ostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <sstream>
-#include <string>
-#include <vector>
 
 void Generator::readFromFile(std::string airport_filename, std::string route_filename, std::unordered_map<std::string, Airport>& map) {
     std::fstream airport_file(airport_filename);
@@ -106,7 +103,7 @@ void Generator::readFromFile(std::string airport_filename, std::string route_fil
 
         //generate the route (edge)
         if (departure.adjacent_airport.find(info[4]) == departure.adjacent_airport.end()) {
-            Route this_flight(distance_between(departure, destination));
+            Route this_flight(calculateDistance(departure.latitude, departure.longitude, destination.latitude, destination.longitude));
             departure.adjacent_airport[info[4]] = this_flight;
         } else {
             departure.adjacent_airport[info[4]].num_flight += 1;

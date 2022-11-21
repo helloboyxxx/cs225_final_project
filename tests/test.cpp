@@ -215,3 +215,126 @@ TEST_CASE("Test All shortest path") {
     std::cout << "H's Not Present" << std::endl;
   }
 }
+
+
+
+// check data from airports.txt and routes.txt
+
+// TEST_CASE("Test Distance") {
+//   string airport_filename = "../data/airports.txt";
+//   string route_filename = "../data/routes.txt";
+//   Graph mygraph(airport_filename, route_filename);
+
+//   REQUIRE(mygraph.getDistance("ORD", "BOS") == 1392);
+// }
+
+TEST_CASE("Test Shortest Path, all(direct)-1") {
+  string airport_filename = "../data/airports.txt";
+  string route_filename = "../data/routes.txt";
+  Graph mygraph(airport_filename, route_filename);
+  string source = "ORD";
+  string dest = "JFK";
+
+  REQUIRE(mygraph.assertAirportExists(source) == true);
+  REQUIRE(mygraph.assertAirportExists(dest) == true);
+  REQUIRE(mygraph.assertRouteExists(source, dest) == true);
+
+  auto result = mygraph.shortestPath(source, dest);
+  vector<string> shortest_path = {source, dest};
+  REQUIRE(mygraph.shortestPath(source, dest).size() == 2);
+  REQUIRE(mygraph.shortestPath(source, dest) == shortest_path);
+}
+
+TEST_CASE("Test Shortest Path, all(direct)-2") {
+  string airport_filename = "../data/airports.txt";
+  string route_filename = "../data/routes.txt";
+  Graph mygraph(airport_filename, route_filename);
+  string source = "HKG";
+  string dest = "SFO";
+
+  REQUIRE(mygraph.assertAirportExists(source) == true);
+  REQUIRE(mygraph.assertAirportExists(dest) == true);
+  REQUIRE(mygraph.assertRouteExists(source, dest) == true);
+
+  auto result = mygraph.shortestPath(source, dest);
+  vector<string> shortest_path = {source, dest};
+  REQUIRE(mygraph.shortestPath(source, dest).size() == 2);
+  REQUIRE(mygraph.shortestPath(source, dest) == shortest_path);
+}
+
+TEST_CASE("Test Shortest Path, all(indirect)-1") {
+  string airport_filename = "../data/airports.txt";
+  string route_filename = "../data/routes.txt";
+  Graph mygraph(airport_filename, route_filename);
+  string source = "STR";
+  string dest = "YGW";
+
+  REQUIRE(mygraph.assertAirportExists(source) == true);
+  REQUIRE(mygraph.assertAirportExists(dest) == true);
+  REQUIRE(mygraph.assertRouteExists(source, dest) == false);
+
+  auto result = mygraph.shortestPath(source, dest);
+  for (auto a: result) {
+    cout << a << " ";
+  }
+}
+
+TEST_CASE("Test Shortest Path, all(indirect)-2") {
+  string airport_filename = "../data/airports.txt";
+  string route_filename = "../data/routes.txt";
+  Graph mygraph(airport_filename, route_filename);
+  string source = "ORD";
+  string dest = "ATH";
+
+  REQUIRE(mygraph.assertAirportExists(source) == true);
+  REQUIRE(mygraph.assertAirportExists(dest) == true);
+  REQUIRE(mygraph.assertRouteExists(source, dest) == false);
+
+  auto result = mygraph.shortestPath(source, dest);
+  for (auto a: result) {
+    cout << a << " ";
+  }
+}
+
+TEST_CASE("Test All Shortest Path, all") {
+  string airport_filename = "../data/airports.txt";
+  string route_filename = "../data/routes.txt";
+  Graph mygraph(airport_filename, route_filename);
+  string source = "ORD";
+
+  vector<vector<string>> result = mygraph.allShortestPath(source);
+  std::set<vector<string>> shortest_paths;
+  for (vector<string> path: result) {
+    shortest_paths.insert(path);
+  }
+
+  vector<string> a = {source, "JFK"};
+  auto posA = shortest_paths.find(a);
+  if (posA == shortest_paths.end()) {
+    std::cout << "ORD-JFK Not Present" << std::endl;
+  }
+
+  vector<string> b = {source, "LHR"};
+  auto posB = shortest_paths.find(b);
+  if (posB == shortest_paths.end()) {
+    std::cout << "ORD-LHR Not Present" << std::endl;
+  }
+
+  vector<string> c = {source, "NRT", "CEB", "ZAM"};
+  auto posC = shortest_paths.find(c);
+  if (posC == shortest_paths.end()) {
+    std::cout << "ORD-ZAM Not Present" << std::endl;
+  }
+
+  vector<string> d = {source, "PEK", "SZX"};
+  auto posD = shortest_paths.find(d);
+  if (posD == shortest_paths.end()) {
+    std::cout << "ORD-SZX Not Present" << std::endl;
+  }
+
+  vector<string> e = {source, "ZRH", "ATH"};
+  auto posE = shortest_paths.find(e);
+  if (posE == shortest_paths.end()) {
+    std::cout << "ORD-ATH Not Present" << std::endl;
+  }
+}
