@@ -27,6 +27,9 @@ class Graph {
     */
     vector<string> getAdjacentAirports(string IATA) const;
 
+    // const vector<string> & getAdjacentTest(string IATA) const;
+    void getAdjacentTest(string IATA, vector<string> airports ) const;
+
     /*
     Return all the airports in this graph as a vector of their IATAs.
     */
@@ -117,8 +120,6 @@ class Graph {
     bool assertRouteExists(string source, string dest) const;
 
     bool assertAirportExists(string IATA) const;
-
-
   private:
 
     /**
