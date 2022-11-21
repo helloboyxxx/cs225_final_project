@@ -19,12 +19,13 @@ class Graph {
 
 
     /**
+    * Return the adjacent airports of this airport
     * The function takes in the IATA of an airport 
-    * and returns a map that stores info about adjacent airports
+    * and returns a vector of its adjacent airports' IATAs.
+    * If the given IATA is not in the graph, we return an empty vector.
+    * Assume that this is a connected graph.
     */
-    const std::unordered_map<std::string, Route>& getAdjacentAirports(string IATA) const;
-
-    void getAdjacentTest(string IATA, vector<string>& airports) const;
+    vector<string> getAdjacentAirports(string IATA) const;
 
     /*
     Return all the airports in this graph as a vector of their IATAs.
@@ -163,5 +164,12 @@ class Graph {
      * @param message - the error message that should be printed
      */
     void printError(string message) const;
+
+
+    /**
+    * The function takes in the IATA of an airport 
+    * and returns a map that stores info about adjacent airports
+    */
+    const std::unordered_map<std::string, Route>& getAdjacentMap(string IATA) const;
 
 };

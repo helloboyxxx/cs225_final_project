@@ -9,12 +9,10 @@
 #include <queue>
 #include <unordered_set>
 #include <algorithm>
-#include <chrono>
 #include <set>
 
 using std::cout;
 using std::endl;
-using namespace std::chrono;
 
 /*
 double distance, string IATA. Used in calcPrevious
@@ -37,20 +35,28 @@ vector<string> Graph::getAllAirports() const {
   return airports;
 }
 
-const std::unordered_map<std::string, Route>& Graph::getAdjacentAirports(string IATA) const {
+vector<string> Graph::getAdjacentAirports(string IATA) const {
+  if (assertAirportExists(IATA, __func__) == false) {
+    return vector<string>();
+  }
+
+  const Airport& A = airport_map.find(IATA)->second;    // A is the Airport struct of the given source
+
+  vector<string> airports;
+  for (auto &airport : A.adjacent_airport) {
+    airports.push_back(airport.first);
+  }
+  return airports;
+}
+
+
+const std::unordered_map<std::string, Route>& Graph::getAdjacentMap(string IATA) const {
   if (assertAirportExists(IATA, __func__) == false) {
     throw std::invalid_argument("Invalid argument in getAdjacentAirports");
   }
   return airport_map.find(IATA)->second.adjacent_airport;
 }
 
-
-void Graph::getAdjacentTest(string IATA, vector<string>& airports) const {
-  const Airport& A = airport_map.find(IATA)->second;    // A is the Airport struct of the given source
-  for (auto &airport : A.adjacent_airport) {
-    airports.push_back(airport.first);
-  }
-}
 
 double Graph::getDistance(string source, string dest) const {
   // // Use these three lines when debugging. (Since it is easier to understand.)
@@ -182,55 +188,7 @@ vector<vector<string>> Graph::allShortestPath(string source) const {
   return to_return;
 }
 
-// void Graph::calcPrevious(string source, std::unordered_map<string, string>& previous) const {
-//   previous.clear();
-//   // stores airport IATA that has been visited before
-//   std::unordered_set<string> visited; 
-//   // key: current IATA, value: shortest total distance from source to current
-//   std::unordered_map<string, double> distances;
-
-//   // Initialize both distance and previous
-//   for (const auto& airport : airport_map) {
-//     string IATA = airport.first;
-//     distances[IATA] = DBL_MAX;    // create a disPair and insert into distance graph
-//     previous[IATA] = "";
-//   }
-//   // Set distance of source to zero
-//   distances[source] = 0;
-
-//   // initialize priority_queue.
-//   std::priority_queue< disPair, vector<disPair>, std::greater<disPair> > Q;
-//   Q.push({0, source});
-  
-//   // Dijkstra starts
-//   while ( !Q.empty() ) {
-//     string cur_airport = Q.top().second;
-//     Q.pop();
-//     if (visited.find(cur_airport) != visited.end())
-//       continue;
-//     visited.insert(cur_airport);
-
-//     // Loop through the neighbors of this airport
-//     for (auto adj_pair : getAdjacentAirports(cur_airport)) {
-//       string neighbor = adj_pair.first;
-//       if (visited.find(neighbor) != visited.end())
-//         continue;   // skip when visited this airport before
-      
-//       double cur_distance = getDistance(cur_airport, neighbor);
-//       if (cur_distance + distances[cur_airport] < distances[neighbor]) {
-//         distances[neighbor] = cur_distance + distances[cur_airport];
-//         previous[neighbor] = cur_airport;
-
-//         // update the priority queue with neighbor and its new distance.
-//         Q.push({distances[neighbor], neighbor});
-//       }
-//     }
-//   }
-// }
-
-
-
-// Not using priority Q but using set
+// Not using priority queue but using set
 // reference: http://nmamano.com/blog/dijkstra/dijkstra.html
 void Graph::calcPrevious(string source, std::unordered_map<string, string>& previous) const {
   previous.clear();
@@ -250,20 +208,21 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
 
   // Q stores future nodes
   std::set<disPair> Q;
-  Q.insert({0, source});
+  // Q.insert({0, source});
+  Q.emplace( 0, source );
   
   // Dijkstra starts
-  while ( !Q.empty() ) {                                                    // O(n)
-    string cur_airport = Q.begin()->second;                                 // O(1)
+  while ( !Q.empty() ) {                                                          // O(n)
+    string cur_airport = Q.begin()->second;                                       // O(1)
     Q.erase(Q.begin());
 
     // Skip visited cur_airport
     if (visited.find(cur_airport) != visited.end())
       continue;
-    visited.insert(cur_airport);
+    visited.emplace(cur_airport);
 
     // Loop through the neighbors of this airport
-    for (auto adj_pair : getAdjacentAirports(cur_airport)) {                // O(m) since we have at most m edges
+    for (const auto& adj_pair : getAdjacentMap(cur_airport)) {               // O(m) since we have at most m edges
       string neighbor = adj_pair.first;
       if (visited.find(neighbor) != visited.end())
         continue;   // skip when visited this airport before
@@ -271,13 +230,13 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
       double cur_distance = getDistance(cur_airport, neighbor);
       if (cur_distance + distances[cur_airport] < distances[neighbor]) {
         // Erase old distance
-        Q.erase({distances[neighbor], neighbor});                           // O(log_n) since std::set is self_balanced BST
+        Q.erase({distances[neighbor], neighbor});                                 // O(log_n) since std::set is self_balanced BST
 
         distances[neighbor] = cur_distance + distances[cur_airport];
         previous[neighbor] = cur_airport;
         
         // update the set with neighbor and its new distance.
-        Q.insert({distances[neighbor], neighbor});                          // O(log_n) 
+        Q.emplace( distances[neighbor], neighbor );                               // O(log_n)
       }
     }
   }
@@ -303,7 +262,7 @@ vector<string> Graph::BFS(string source) const {
     Q.pop();
     output.push_back(cur_airport);
 
-    for (auto adj_pair : getAdjacentAirports(cur_airport)) {
+    for (auto adj_pair : getAdjacentMap(cur_airport)) {
       string a = adj_pair.first;
       // Not adding visited airport
       if (visited.find(a) == visited.end()) {
