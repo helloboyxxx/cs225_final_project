@@ -24,8 +24,19 @@ typedef std::pair<double, string> disPair;
 Graph::Graph(string airport_filename, string route_filename) {
   airport_map = std::unordered_map<std::string, Airport>();
   Generator::readFromFile(airport_filename, route_filename, airport_map);
-
+  pruneAirports();
 }
+
+
+void Graph::pruneAirports() {
+  for (const string& airport : getAllAirports()) {
+    const auto& pair = airport_map.find(airport);
+    if (pair->second.route_in == 0 || pair->second.route_out == 0) {
+      removeAirport(airport);
+    }
+  }
+}
+
 
 vector<string> Graph::getAllAirports() const {
   vector<string> airports;
@@ -101,7 +112,7 @@ void Graph::removeAirport(string IATA) {
     for (auto it = airport_map.begin(); it != airport_map.end(); ++it) {
       auto& adj_airport = it->second.adjacent_airport;
       if (adj_airport.find(IATA) != adj_airport.end()) {
-        adj_airport.erase(IATA);
+        adj_airport.erase(IATA);    // Erase route
       }
     }
   }
@@ -243,10 +254,6 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
 }
 
 
-
-
-
-
 vector<string> Graph::BFS(string source) const {
   if (assertAirportExists(source, __func__) == false ) {
     return vector<string>(); 
@@ -255,7 +262,7 @@ vector<string> Graph::BFS(string source) const {
   std::unordered_set<string> visited;
   std::queue<string> Q;
   Q.push(source);
-  visited.insert(source);
+  visited.emplace(source);
 
   while( !Q.empty() ) {
     string cur_airport = Q.front();
@@ -266,8 +273,8 @@ vector<string> Graph::BFS(string source) const {
       string a = adj_pair.first;
       // Not adding visited airport
       if (visited.find(a) == visited.end()) {
-        Q.push(a);
-        visited.insert(a);
+        Q.emplace(a);
+        visited.emplace(a);
       }
     }
   }

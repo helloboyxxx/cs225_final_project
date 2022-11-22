@@ -120,6 +120,9 @@ class Graph {
 
   private:
 
+    // remove all invalid airports
+    void pruneAirports();
+
     /**
     Given the source airport, this function will use Dijkstra's algorithm to calculate 
     the the parent of every airport. This can then be used for both shortest path functions
@@ -164,7 +167,6 @@ class Graph {
      * @param message - the error message that should be printed
      */
     void printError(string message) const;
-
 
     /**
     * The function takes in the IATA of an airport 
