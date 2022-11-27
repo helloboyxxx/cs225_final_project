@@ -68,7 +68,6 @@ const std::unordered_map<std::string, Route>& Graph::getAdjacentMap(string IATA)
   return airport_map.find(IATA)->second.adjacent_airport;
 }
 
-
 double Graph::getDistance(string source, string dest) const {
   // // Use these three lines when debugging. (Since it is easier to understand.)
   // // I included the optimized version below. Uncomment to run. 
@@ -230,8 +229,8 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
     // Skip visited cur_airport
     if (visited.find(cur_airport) != visited.end())
       continue;
+      
     visited.emplace(cur_airport);
-
     // Loop through the neighbors of this airport
     for (const auto& adj_pair : getAdjacentMap(cur_airport)) {               // O(m) since we have at most m edges
       string neighbor = adj_pair.first;
