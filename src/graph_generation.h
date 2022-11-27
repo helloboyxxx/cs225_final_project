@@ -16,10 +16,8 @@
 
 class Generator {
 public:
-    static void readFromFile(std::string airport_filename, std::string route_filename, std::unordered_map<std::string, Airport>& map);
-    static void writeToFile(std::string filename, std::unordered_map<std::string, Airport>);
-private:
-    static double distance_between(Airport a, Airport b);
+    static void readFromFile(std::string airport_filename, std::string route_filename, std::unordered_map<unsigned, Airport>& map);
+    static void writeToFile(std::string filename, std::unordered_map<unsigned, Airport>&);
 };
 
 /**

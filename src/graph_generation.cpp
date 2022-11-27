@@ -2,11 +2,12 @@
 #include "structures.h"
 #include <fstream>
 #include <ostream>
+#include <string>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <sstream>
 
-void Generator::readFromFile(std::string airport_filename, std::string route_filename, std::unordered_map<std::string, Airport>& map) {
+void Generator::readFromFile(std::string airport_filename, std::string route_filename, std::unordered_map<unsigned, Airport>& map) {
     std::fstream airport_file(airport_filename);
     std::fstream route_file(route_filename);
     if (!airport_file.is_open() || !route_file.is_open()) {
@@ -40,11 +41,13 @@ void Generator::readFromFile(std::string airport_filename, std::string route_fil
         // 12: Type
         // 13: Source
         Airport ap(
-            info[4].substr(1, (info[4]).size() - 2),    
-            info[2].substr(1, (info[2]).size() - 2), 
-            info[3].substr(1, (info[3]).size() - 2),
-            std::stod(info[7]), std::stod(info[6]), std::stod(info[8]));
-        map[info[4].substr(1, (info[4]).size() - 2)] = ap;
+            std::stoul(info[0]),                        // ID
+            info[4].substr(1, (info[4]).size() - 2),    // IATA
+            info[2].substr(1, (info[2]).size() - 2),    // City
+            info[3].substr(1, (info[3]).size() - 2),    // Country
+            std::stod(info[7]), std::stod(info[6])      // latitude and longtitude
+        );
+        map[ std::stoul(info[0]) ] = ap;
     }
     
     // generate all edge (route)
@@ -69,11 +72,15 @@ void Generator::readFromFile(std::string airport_filename, std::string route_fil
         //skip if this is NOT non-stop flight
         if (info[7] != "0") continue;
         //skip if this is NOT an recorded airport   either departure or destination
-        if (map.find(info[2]) == map.end()) continue;
-        if (map.find(info[4]) == map.end()) continue;
+        if (info[3] == "\\N") continue;
+        if (info[5] == "\\N") continue;
+        unsigned source_id = std::stoul(info[3]);
+        unsigned dest_id = std::stoul(info[5]);
+        if (map.find(source_id) == map.end()) continue;
+        if (map.find(dest_id) == map.end()) continue;
 
-        Airport& departure = map[info[2]];
-        Airport& destination = map[info[4]];
+        Airport& departure = map[source_id];
+        Airport& destination = map[dest_id];
         
         //record 1 flight out (edge out)
         departure.route_out += 1;
@@ -81,11 +88,11 @@ void Generator::readFromFile(std::string airport_filename, std::string route_fil
         destination.route_in += 1;
 
         //generate the route (edge)
-        if (departure.adjacent_airport.find(info[4]) == departure.adjacent_airport.end()) {
+        if (departure.adjacent_airport.find(dest_id) == departure.adjacent_airport.end()) {
             Route this_flight(calculateDistance(departure.latitude, departure.longitude, destination.latitude, destination.longitude));
-            departure.adjacent_airport[info[4]] = this_flight;
+            departure.adjacent_airport[dest_id] = this_flight;
         } else {
-            departure.adjacent_airport[info[4]].num_flight += 1;
+            departure.adjacent_airport[dest_id].num_flight += 1;
         }
     }
     auto it = map.begin();
@@ -98,26 +105,22 @@ void Generator::readFromFile(std::string airport_filename, std::string route_fil
     }
 }
 
-void writeToFile(std::string filename, std::unordered_map<std::string, Airport> map) {
-    //create file
-    std::fstream file;
-    file.open(filename);
-    file << "-Country~City~Departure Airport  --Destination Airport~~~distance between \n" << std::endl;
+// void writeToFile(std::string filename, std::unordered_map<std::string, Airport> map) {
+//     //create file
+//     std::fstream file;
+//     file.open(filename);
+//     file << "-Country~City~Departure Airport  --Destination Airport~~~distance between \n" << std::endl;
 
-    for (auto it : map) {
-        Airport airport = it.second;
-        file << airport.country<<" - "<< airport.city<<" - "<<it.first<<std::endl;
-        for (auto des : airport.adjacent_airport) {
-            file<<"        "<<des.first<<" ~~~ "<<des.second.distance<<std::endl;
-        }
-    }
-    file.close();
-}
+//     for (auto it : map) {
+//         Airport airport = it.second;
+//         file << airport.country<<" - "<< airport.city<<" - "<<it.first<<std::endl;
+//         for (auto des : airport.adjacent_airport) {
+//             file<<"        "<<des.first<<" ~~~ "<<des.second.distance<<std::endl;
+//         }
+//     }
+//     file.close();
+// }
 
-double Generator::distance_between(Airport a, Airport b) {
-    double d = pow(a.altitude - b.altitude, 2) + pow(a.longitude - b.longitude, 2) + pow(a.latitude - b.latitude, 2);
-    return std::sqrt(d);
-}
 
 double calculateDistance(double lat1, double long1, double lat2, double long2) {
     double dlat1 = toRadians(lat1);

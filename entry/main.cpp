@@ -31,47 +31,53 @@ int main()
     string route_filename = "../data/routes.txt";
     Graph mygraph(airport_filename, route_filename);
     string source = "ORD";
-    string dest = "SXX";
+    string dest = "LAS";
 
 
-    // Find unconnected component
-    std::unordered_set<string> visited;
-    for (string& airport : mygraph.BFS(source)) {
-        visited.emplace(airport);
-    }
-
-    std::vector<string> invalid_airports;
-
-    for (string& airport : mygraph.getAllAirports()) {
-        if (visited.find(airport) == visited.end()) {
-            cout << "Invalid airport: " << airport << endl;
-            invalid_airports.push_back(airport);
-        }
-    }
-
-    // Check invalid airport to ORD
-    for (const string& airport : invalid_airports) {
-        if (mygraph.shortestPath(airport, "ORD").size() != 1) {
-            cout << airport <<" to ORD: ";
-            for (string& airport : mygraph.shortestPath(airport, "ORD")) {
-                cout << airport << " ";
-            }
-            cout << endl;
-        }
-    }
-
-    // cout << "ORD to UVE" << endl; 
-    // for (string& airport : mygraph.shortestPath(source, dest)) {
-    //     cout << airport << " ";
+    // // Find unconnected component
+    // std::unordered_set<string> visited;
+    // for (string& airport : mygraph.BFS(source)) {
+    //     visited.emplace(airport);
     // }
-    // cout << endl;
+
+    // std::vector<string> invalid_airports;
+
+    // for (string& airport : mygraph.getAllAirports()) {
+    //     if (visited.find(airport) == visited.end()) {
+    //         cout << "Invalid airport: " << airport << endl;
+    //         invalid_airports.push_back(airport);
+    //     }
+    // }
+
+    // // Check invalid airport to ORD
+    // for (const string& airport : invalid_airports) {
+    //     if (mygraph.shortestPath(airport, "ORD").size() != 1) {
+    //         cout << airport <<" to ORD: ";
+    //         for (string& airport : mygraph.shortestPath(airport, "ORD")) {
+    //             cout << airport << " ";
+    //         }
+    //         cout << endl;
+    //     }
+    // }
+
+    auto start = high_resolution_clock::now();
+
+    cout << "ORD to LAS" << endl; 
+    for (string& airport : mygraph.shortestPath(source, dest)) {
+        cout << airport << " ";
+    }
+    cout << endl;
+
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end - start);
+    cout << "shortestPaths spent: "<< duration.count() << " milliseconds" << endl;
 
 
-    unsigned short_length = mygraph.allShortestPath("UVE").size();
-    unsigned bfs_length = mygraph.BFS("UVE").size();
-    cout << "All airports num: " << mygraph.getAllAirports().size() << endl;
-    cout << "short_length: " << short_length << endl;
-    cout << "bfs_length: " << bfs_length << endl;
+    // unsigned short_length = mygraph.allShortestPath("UVE").size();
+    // unsigned bfs_length = mygraph.BFS("UVE").size();
+    // cout << "All airports num: " << mygraph.getAllAirports().size() << endl;
+    // cout << "short_length: " << short_length << endl;
+    // cout << "bfs_length: " << bfs_length << endl;
 
     // cout << "UVE to ORD: ";
     // for (string& airport : mygraph.shortestPath("UVE", "ORD")) {
