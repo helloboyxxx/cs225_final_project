@@ -220,13 +220,13 @@ TEST_CASE("Test All shortest path") {
 
 // check data from airports.txt and routes.txt
 
-// TEST_CASE("Test Distance") {
-//   string airport_filename = "../data/airports.txt";
-//   string route_filename = "../data/routes.txt";
-//   Graph mygraph(airport_filename, route_filename);
+TEST_CASE("Test Distance") {
+  string airport_filename = "../data/airports.txt";
+  string route_filename = "../data/routes.txt";
+  Graph mygraph(airport_filename, route_filename);
 
-//   REQUIRE(mygraph.getDistance("ORD", "BOS") == 1392);
-// }
+  REQUIRE(mygraph.getDistance("ORD", "BOS") == 1392);
+}
 
 TEST_CASE("Test Shortest Path, all(direct)-1") {
   string airport_filename = "../data/airports.txt";
@@ -337,4 +337,15 @@ TEST_CASE("Test All Shortest Path, all") {
   if (posE == shortest_paths.end()) {
     std::cout << "ORD-ATH Not Present" << std::endl;
   }
+}
+
+TEST_CASE("Test All Shortest Path size") {
+  string airport_filename = "../data/airports.txt";
+  string route_filename = "../data/routes.txt";
+  Graph mygraph(airport_filename, route_filename);
+  string source = "YYZ";
+  unsigned short_length = mygraph.allShortestPath(source).size();
+  unsigned bfs_length = mygraph.BFS(source).size();
+  cout << "All airports num: " << mygraph.getAllAirports().size() << endl;
+  REQUIRE(short_length == bfs_length);
 }

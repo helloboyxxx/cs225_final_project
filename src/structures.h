@@ -4,16 +4,17 @@
 #include <string>
 #include <iostream>
 
-const double InvalidDouble = -114514;
+const double kInvalidDouble = -114514;
 
 /**
  * This is a struct that holds route information of each airport, including number of flights and distance of travel
 */
 struct Route {
-    Route() : num_flight(0), distance(-1) { }
-    Route(double dist) : num_flight(1), distance(dist) { }
-    unsigned num_flight;
-    double distance;
+    Route() = default;
+    Route(double dist) : num_flight(1), distance(dist) {}
+
+    unsigned num_flight = 0;
+    double distance = -1;
 };
 
 /**
@@ -27,12 +28,10 @@ struct Airport {
     latitude, longitude, altitude all have special value -114514.
     route_in, route_out, frequency = 0 by default
     */
-    Airport()
-        : IATA(""), city(""), country(""), longitude(InvalidDouble),
-          latitude(InvalidDouble), altitude(InvalidDouble), frequency(0) {}
+    Airport() = default;
 
     Airport(std::string _IATA, std::string _city, std::string _country, double _lo, double _la, double _al) : 
-        IATA(_IATA), city(_city), country(_country), longitude(_lo), latitude(_la), altitude(_al), frequency(0) {  }
+        IATA(_IATA), city(_city), country(_country), longitude(_lo), latitude(_la), altitude(_al), frequency(0) {}
     
     std::string IATA;
 
@@ -47,12 +46,12 @@ struct Airport {
     //number of flights departing
     unsigned route_out = 0;
 
-    double longitude;
-    double latitude;
-    double altitude;    
+    double longitude = kInvalidDouble;
+    double latitude = kInvalidDouble;
+    double altitude = kInvalidDouble;    
 
     // Storing the number of shortest path that passes through this airport
-    unsigned frequency;
+    unsigned frequency = 0;
 
     /**
     * Key: IATA of adjacent airports, value: distance of this route

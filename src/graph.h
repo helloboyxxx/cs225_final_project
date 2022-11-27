@@ -120,7 +120,11 @@ class Graph {
     bool assertRouteExists(string source, string dest) const;
 
     bool assertAirportExists(string IATA) const;
+
   private:
+
+    // remove all invalid airports
+    void pruneAirports();
 
     /**
     Given the source airport, this function will use Dijkstra's algorithm to calculate 
@@ -166,5 +170,11 @@ class Graph {
      * @param message - the error message that should be printed
      */
     void printError(string message) const;
+
+    /**
+    * The function takes in the IATA of an airport 
+    * and returns a map that stores info about adjacent airports
+    */
+    const std::unordered_map<std::string, Route>& getAdjacentMap(string IATA) const;
 
 };

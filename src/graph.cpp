@@ -2,17 +2,17 @@
 #include "graph_generation.h"
 #include "structures.h"
 #include <cfloat>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <limits>
 #include <queue>
 #include <unordered_set>
 #include <algorithm>
-#include <chrono>
+#include <set>
 
 using std::cout;
 using std::endl;
-using namespace std::chrono;
 
 /*
 double distance, string IATA. Used in calcPrevious
@@ -24,8 +24,19 @@ typedef std::pair<double, string> disPair;
 Graph::Graph(string airport_filename, string route_filename) {
   airport_map = std::unordered_map<std::string, Airport>();
   Generator::readFromFile(airport_filename, route_filename, airport_map);
-
+  pruneAirports();
 }
+
+
+void Graph::pruneAirports() {
+  for (const string& airport : getAllAirports()) {
+    const auto& pair = airport_map.find(airport);
+    if (pair->second.route_in == 0 || pair->second.route_out == 0) {
+      removeAirport(airport);
+    }
+  }
+}
+
 
 vector<string> Graph::getAllAirports() const {
   vector<string> airports;
@@ -49,6 +60,13 @@ vector<string> Graph::getAdjacentAirports(string IATA) const {
   return airports;
 }
 
+
+const std::unordered_map<std::string, Route>& Graph::getAdjacentMap(string IATA) const {
+  if (assertAirportExists(IATA, __func__) == false) {
+    throw std::invalid_argument("Invalid argument in getAdjacentAirports");
+  }
+  return airport_map.find(IATA)->second.adjacent_airport;
+}
 
 double Graph::getDistance(string source, string dest) const {
   // // Use these three lines when debugging. (Since it is easier to understand.)
@@ -93,7 +111,7 @@ void Graph::removeAirport(string IATA) {
     for (auto it = airport_map.begin(); it != airport_map.end(); ++it) {
       auto& adj_airport = it->second.adjacent_airport;
       if (adj_airport.find(IATA) != adj_airport.end()) {
-        adj_airport.erase(IATA);
+        adj_airport.erase(IATA);    // Erase route
       }
     }
   }
@@ -180,6 +198,8 @@ vector<vector<string>> Graph::allShortestPath(string source) const {
   return to_return;
 }
 
+// Not using priority queue but using set
+// reference: http://nmamano.com/blog/dijkstra/dijkstra.html
 void Graph::calcPrevious(string source, std::unordered_map<string, string>& previous) const {
   previous.clear();
   // stores airport IATA that has been visited before
@@ -196,34 +216,42 @@ void Graph::calcPrevious(string source, std::unordered_map<string, string>& prev
   // Set distance of source to zero
   distances[source] = 0;
 
-  // initialize priority_queue.
-  std::priority_queue< disPair, vector<disPair>, std::greater<disPair> > Q;
-  Q.push({0, source});
+  // Q stores future nodes
+  std::set<disPair> Q;
+  // Q.insert({0, source});
+  Q.emplace( 0, source );
   
   // Dijkstra starts
-  while ( !Q.empty() ) {
-    string cur_airport = Q.top().second;
-    Q.pop();
+  while ( !Q.empty() ) {                                                          // O(n)
+    string cur_airport = Q.begin()->second;                                       // O(1)
+    Q.erase(Q.begin());
+
+    // Skip visited cur_airport
     if (visited.find(cur_airport) != visited.end())
       continue;
-    visited.insert(cur_airport);
-    
+      
+    visited.emplace(cur_airport);
     // Loop through the neighbors of this airport
-    for (auto neighbor : getAdjacentAirports(cur_airport)) {
+    for (const auto& adj_pair : getAdjacentMap(cur_airport)) {               // O(m) since we have at most m edges
+      string neighbor = adj_pair.first;
       if (visited.find(neighbor) != visited.end())
         continue;   // skip when visited this airport before
       
       double cur_distance = getDistance(cur_airport, neighbor);
       if (cur_distance + distances[cur_airport] < distances[neighbor]) {
+        // Erase old distance
+        Q.erase({distances[neighbor], neighbor});                                 // O(log_n) since std::set is self_balanced BST
+
         distances[neighbor] = cur_distance + distances[cur_airport];
         previous[neighbor] = cur_airport;
-
-        // update the priority queue with neighbor and its new distance.
-        Q.push({distances[neighbor], neighbor});
+        
+        // update the set with neighbor and its new distance.
+        Q.emplace( distances[neighbor], neighbor );                               // O(log_n)
       }
     }
   }
 }
+
 
 vector<string> Graph::BFS(string source) const {
   if (assertAirportExists(source, __func__) == false ) {
@@ -233,18 +261,19 @@ vector<string> Graph::BFS(string source) const {
   std::unordered_set<string> visited;
   std::queue<string> Q;
   Q.push(source);
-  visited.insert(source);
+  visited.emplace(source);
 
   while( !Q.empty() ) {
     string cur_airport = Q.front();
     Q.pop();
     output.push_back(cur_airport);
-    vector<string> adj = getAdjacentAirports(cur_airport);
-    for (string a : adj) {
+
+    for (auto adj_pair : getAdjacentMap(cur_airport)) {
+      string a = adj_pair.first;
       // Not adding visited airport
       if (visited.find(a) == visited.end()) {
-        Q.push(a);
-        visited.insert(a);
+        Q.emplace(a);
+        visited.emplace(a);
       }
     }
   }

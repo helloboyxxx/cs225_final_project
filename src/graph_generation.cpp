@@ -23,27 +23,6 @@ void Generator::readFromFile(std::string airport_filename, std::string route_fil
             info.push_back(each_info);
         }
         if (info.size() != 14) continue;
-        // std::string data = "";
-        // bool start = false;
-        // for (std::string::iterator c = line.begin(); c != line.end(); c++) {
-        //     if (*c == ',' && start == false) {
-        //         if (data.empty()) continue;
-        //         info.push_back(data);
-        //         data.clear();
-        //         continue;
-        //     }
-        //     if (data.empty() && *c == '"') {
-        //         start = true;
-        //         continue;
-        //     }
-        //     if (start && *c == '"') {
-        //         start = false;
-        //         info.push_back(data);
-        //         data.clear();
-        //         continue;
-        //     }
-        //     data += *c;
-        // }
 
         // each info contains the following info in order:
         // 0: Airport ID 
@@ -117,7 +96,6 @@ void Generator::readFromFile(std::string airport_filename, std::string route_fil
             ++it;
         }
     }
-
 }
 
 void writeToFile(std::string filename, std::unordered_map<std::string, Airport> map) {
