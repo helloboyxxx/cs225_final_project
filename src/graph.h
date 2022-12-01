@@ -136,6 +136,8 @@ class Graph {
      * false otherwise.
     */
     bool getFrequencyUpdated() const { return frequency_updated; }
+
+    std::pair<std::string, unsigned> getMostImportantAirport() const;
   private:
     // true if the frequencies of the airports is updated 
     bool frequency_updated = false;

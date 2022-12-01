@@ -36,6 +36,12 @@ int main()
     auto start = high_resolution_clock::now();
 
     mygraph.calcFrequency();
+
+    std::pair<std::string, unsigned> airport = mygraph.getMostImportantAirport();
+
+    cout << "Most Important Airport: " << airport.first << endl;
+    cout << "Frequency num: " << std::to_string(airport.second) << endl;
+
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(end - start);
     cout << "Centrality spent: "<< duration.count() << " milliseconds" << endl;

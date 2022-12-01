@@ -398,3 +398,16 @@ void Graph::calcFrequency() {
   }
   frequency_updated = true;
 }
+
+std::pair<std::string, unsigned> Graph::getMostImportantAirport() const {
+  if (frequency_updated != true) return std::pair<std::string, unsigned>();
+  unsigned hightest_freq = 0;
+  std::string IATA = "";
+  for (auto& airport : airport_map) {
+    if (airport.second.frequency > hightest_freq) {
+      IATA = airport.second.IATA;
+      hightest_freq = airport.second.frequency;
+    }
+  }
+  return std::pair<std::string, unsigned>(IATA, hightest_freq);
+}
