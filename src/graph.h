@@ -2,9 +2,23 @@
 
 #include "structures.h"
 
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <set>
+
+/**
+ * double distance, unsigned ID.
+ * Used in calcPrevious. Distance placed in the front since operator> in
+ * std::pair will compare the first element by defaut
+ */
+typedef std::pair<double, unsigned> disPair;
+
+/**
+* unsigned frequency, unsigned airport ID
+*/
+typedef std::pair<unsigned, unsigned> freqPair;
 
 class Graph {
   public:
@@ -152,6 +166,9 @@ class Graph {
     */
     std::unordered_map<std::string, unsigned> ID_map;
 
+    // storing frequencies, sorted from greatest to smallest
+    std::set< freqPair, std::greater<freqPair> > frequencies; 
+
     // The following two functions does not check if the argument is valid or not. 
     std::string IDToIATA(unsigned ID) const {
       return airport_map.find(ID)->second.IATA; 
@@ -170,12 +187,10 @@ class Graph {
     std::vector<unsigned> getAllIDs() const;
 
     /**
-    Given the source airport, this function will use Dijkstra's algorithm to calculate 
-    the the parent of every airport. This can then be used for both shortest path functions
-    @param source source airport ID
-    @param previous a reference to the previous map. key: current ID, value: parent ID
+    * The function takes in the ID of an airport 
+    * and returns a map that stores info about adjacent airports
     */
-    void calcPrevious(unsigned source, std::unordered_map<unsigned, unsigned>& previous) const;
+    const std::unordered_map<unsigned, Route>& getAdjacentMap(unsigned ID) const;
 
 
     /**
@@ -186,6 +201,15 @@ class Graph {
     @returns the distance between two airports.
     */
     double getDistance(unsigned source, unsigned dest) const;
+
+    /**
+    Given the source airport, this function will use Dijkstra's algorithm to calculate 
+    the the parent of every airport. This can then be used for both shortest path functions
+    @param source source airport ID
+    @param previous a reference to the previous map. key: current ID, value: parent ID
+    */
+    void calcPrevious(unsigned source, std::unordered_map<unsigned, unsigned>& previous) const;
+
 
 
     /**
@@ -222,9 +246,12 @@ class Graph {
     void printError(std::string message) const;
 
     /**
-    * The function takes in the ID of an airport 
-    * and returns a map that stores info about adjacent airports
+    * Helper function for calcFrequency. This function will:
+    * (1) generate a file "allFrequency.txt".
+    * (2) also write the frequency into frequencies, a private variable of Graph
+    * It will first write the input file names at the beginning of file. 
+    * It will not overwrite the file if the file names already exists.
     */
-    const std::unordered_map<unsigned, Route>& getAdjacentMap(unsigned ID) const;
+    void writeFrequency();
 
 };

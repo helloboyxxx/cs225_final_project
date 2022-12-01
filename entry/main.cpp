@@ -35,6 +35,7 @@ int main()
 
     auto start = high_resolution_clock::now();
 
+
     mygraph.calcFrequency();
 
     std::pair<std::string, unsigned> airport = mygraph.getMostImportantAirport();

@@ -17,14 +17,9 @@ using std::endl;
 using std::string;
 using std::vector;
 
-/*
-double distance, unsigned ID. Used in calcPrevious
-Distance placed in the front since
-operator> in std::pair will compare the first element by defaut */
-typedef std::pair<double, unsigned> disPair;
-
 
 Graph::Graph(string airport_filename, string route_filename) {
+  airport_map.clear();
   airport_map = std::unordered_map<unsigned, Airport>();
   Generator::readFromFile(airport_filename, route_filename, airport_map);
   pruneAirports();
@@ -397,6 +392,7 @@ void Graph::calcFrequency() {
     }
   }
   frequency_updated = true;
+  writeFrequency();
 }
 
 std::pair<std::string, unsigned> Graph::getMostImportantAirport() const {
@@ -410,4 +406,34 @@ std::pair<std::string, unsigned> Graph::getMostImportantAirport() const {
     }
   }
   return std::pair<std::string, unsigned>(IATA, hightest_freq);
+}
+
+// In progress.
+void Graph::writeFrequency() {
+
+  // Create frequencies first
+  frequencies.clear();
+  for (const auto& airport : airport_map) {
+    unsigned ID = airport.first;
+    unsigned freq = airport.second.frequency;
+
+    // put a freqPair in frequencies
+    frequencies.emplace(freq, ID);
+  }
+
+  // Write from frequencies to file
+  std::string id_filename = "../allFrequency.txt";    // A little hardcoding.
+  std::string IATA_filename = "../allFrequency_IATA.txt";    // A little hardcoding.
+  std::ofstream id_file;
+  std::ofstream IATA_file;
+  id_file.open(id_filename);
+  IATA_file.open(IATA_filename);
+
+  for (const freqPair& freq : frequencies) {
+    id_file << freq.second << "," << freq.first << endl;
+    IATA_file << IDToIATA(freq.second) << "," << freq.first << endl;
+  }
+  id_file.close();
+  IATA_file.close();
+
 }
