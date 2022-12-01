@@ -47,7 +47,7 @@ class Graph {
     Inserts a new airport into the graph.
     This function will overwrite if old stuff was there
     */
-    void insertAirport(Airport a);
+    void insertAirport(Airport& a);
 
     /**
     Removes a given airport from the graph.
@@ -62,12 +62,12 @@ class Graph {
      * Hence, an error is not thrown when it fails to insert an route.
      * In this function we assume that both source and dest exists. 
      * We will assert this before proceeding the rest of our program. 
-     * @param source - source airport ID 
-     * @param dest - destination airport ID
+     * @param source - source airport IATA
+     * @param dest - destination airport IATA
      * @return whether inserting the route was successful. Return false
      * if the route already exist
      */
-    bool insertRoute(unsigned source, unsigned dest, double distance);
+    bool insertRoute(std::string source, std::string dest, double distance);
 
 
     /**
@@ -88,6 +88,8 @@ class Graph {
     
     Function will return an empty std::vector if either of source or dest is not 
     included in graph or if dest is the same as source.
+    Function will return a std::vector of size one storing the IATA of destination airport 
+    if there is not a path from source to dest.
 
     @param source source airport IATA
     @param dest destination airport IATA
@@ -117,18 +119,40 @@ class Graph {
     bool assertRouteExists(std::string source, std::string dest) const;
 
     bool assertAirportExists(std::string IATA) const;
-
+    
+    /**
+     * This function runs the betweenness centrality algorithm 
+     * which runs through Dijkstra's algorithm for each airport in the airport_map 
+     * and updates the frequency of each airport the times it appears to be in 
+     * the shortest path of other two airports.
+     * This function will also update the frequency_updated to true.
+    */
+    void calcFrequency();
+    
+    /**
+     * This function returns the a boolean representing 
+     * the status of the frequencies of airports in the graph.
+     * True means that all frequencies has been updated (calcFrequency has been called), 
+     * false otherwise.
+    */
+    bool getFrequencyUpdated() const { return frequency_updated; }
   private:
+    // true if the frequencies of the airports is updated 
+    bool frequency_updated = false;
 
-    /*
+    /**
     key: airport's ID, value: its corresponding airport struct
     */
     std::unordered_map<unsigned, Airport> airport_map;
 
+    /**
+    Map used for mapping IATA to airport ID. 
+    */
     std::unordered_map<std::string, unsigned> ID_map;
 
+    // The following two functions does not check if the argument is valid or not. 
     std::string IDToIATA(unsigned ID) const {
-      return airport_map.find(ID)->second.IATA;
+      return airport_map.find(ID)->second.IATA; 
     }
 
     unsigned IATAToID(std::string IATA) const {
