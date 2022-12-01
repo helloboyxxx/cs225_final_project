@@ -381,6 +381,7 @@ void Graph::printError(string message) const
 }
 
 void Graph::calcFrequency() {
+  if (frequency_updated == true) return;
   std::unordered_map<unsigned, unsigned> previous;
 
   // loop through each airport in the airport map
