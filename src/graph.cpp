@@ -388,9 +388,10 @@ void Graph::calcFrequency() {
   for (auto& airport : airport_map) {
     // find the shortest path from 
     calcPrevious(airport.first, previous);
-    // for each value stored in previous, increment the count of frequency of the corresponding 
+    // loop previous map
     for (auto& p : previous) {
-      if (p.second != 0) {
+      // increment the corresponding frequency for each airport passed through in a shortest path.
+      if (p.second != 0 && p.second != airport.first) {
         airport_map[p.second].frequency += 1;
       }
     }
