@@ -73,14 +73,14 @@ TEST_CASE("Insert a single airport") {
   REQUIRE(g.getAdjacentAirports("ORD").empty());
 }
 
-// TEST_CASE("Insert and remove one airport") {
-//   Graph g;
-//   Airport a(3830, "ORD", "Chicago", "United States", 41.9786, -87.9048);
-//   g.insertAirport(a);
-//   g.removeAirport("ORD");
-//   REQUIRE(g.getAllAirports().empty());
-//   REQUIRE(g.empty());
-// }
+TEST_CASE("Insert and remove one airport") {
+  Graph g;
+  Airport a(3830, "ORD", "Chicago", "United States", 41.9786, -87.9048);
+  g.insertAirport(a);
+  g.removeAirport(3830);
+  REQUIRE(g.getAllAirports().empty());
+  REQUIRE(g.empty());
+}
 
 TEST_CASE("Insert two airports and one edge") {
   Graph g;
@@ -101,21 +101,6 @@ TEST_CASE("Insert two airports and one edge") {
   REQUIRE(g.getAllAirports().size() == 2);
 }
 
-typedef std::pair<double, string> disPair;
-TEST_CASE("Test Distance struct") {
-  std::priority_queue<disPair, vector<disPair>, std::greater<disPair>> Q;
-  
-  Q.push({3, "DEN"});
-  Q.push({1, "ORD"});
-  Q.push({2, "LAS"});
-
-  cout << Q.top().second << ": " << Q.top().first << endl;
-  Q.pop();
-  cout << Q.top().second << ": " << Q.top().first << endl;
-  Q.pop();
-  cout << Q.top().second << ": " << Q.top().first << endl;
-  Q.pop();
-}
 
 TEST_CASE("BFS test 1") {
   Graph empty_graph;

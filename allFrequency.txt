@@ -1,3 +1,5 @@
+../data/airports.txt
+../data/routes.txt
 3364,139533
 3751,122504
 3830,111542

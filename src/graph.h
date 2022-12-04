@@ -20,6 +20,8 @@ typedef std::pair<double, unsigned> disPair;
 */
 typedef std::pair<unsigned, unsigned> freqPair;
 
+const std::string freq_filename = "../allFrequency.txt";
+
 class Graph {
   public:
 
@@ -93,7 +95,7 @@ class Graph {
 
 
     // Return true if this grpah is empty. 
-    bool empty() const { return airport_map.empty(); }
+    bool empty() const { return airport_map_.empty(); }
 
     /**
     Given the source and destination airports' IATA, this function returns a
@@ -159,23 +161,28 @@ class Graph {
     /**
     key: airport's ID, value: its corresponding airport struct
     */
-    std::unordered_map<unsigned, Airport> airport_map;
+    std::unordered_map<unsigned, Airport> airport_map_;
 
     /**
     Map used for mapping IATA to airport ID. 
     */
-    std::unordered_map<std::string, unsigned> ID_map;
+    std::unordered_map<std::string, unsigned> ID_map_;
 
     // storing frequencies, sorted from greatest to smallest
-    std::set< freqPair, std::greater<freqPair> > frequencies; 
+    std::set< freqPair, std::greater<freqPair> > frequencies_; 
+
+    // Initially empty airport filename, non-empty after constructor
+    std::string airport_filename_;
+    // Initially empty airport filename, non-empty after constructor
+    std::string route_filename_;
 
     // The following two functions does not check if the argument is valid or not. 
     std::string IDToIATA(unsigned ID) const {
-      return airport_map.find(ID)->second.IATA; 
+      return airport_map_.find(ID)->second.IATA; 
     }
 
     unsigned IATAToID(std::string IATA) const {
-      return ID_map.find(IATA)->second;
+      return ID_map_.find(IATA)->second;
     }
 
     // remove all invalid airports
@@ -247,11 +254,27 @@ class Graph {
 
     /**
     * Helper function for calcFrequency. This function will:
-    * (1) generate a file "allFrequency.txt".
+    * (1) generate a file using freq_filename (defined as a constant in graph.h)
     * (2) also write the frequency into frequencies, a private variable of Graph
     * It will first write the input file names at the beginning of file. 
     * It will not overwrite the file if the file names already exists.
     */
     void writeFrequency();
+
+
+    /**
+    * Read from freq_filename and construct frequencies_.
+    * Should only be called when freqExsists.
+    */
+    void readFrequency();
+
+
+
+    /**
+    * This function will return true when: 
+    * (1) the file freq_file exsists. 
+    * (2) the first two lines in that file matches the airport_filename and route_filename. 
+    */
+    bool freqExsists() const;
 
 };

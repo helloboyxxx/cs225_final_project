@@ -1,3 +1,5 @@
+../data/airports.txt
+../data/routes.txt
 PEK,139533
 DEN,122504
 ORD,111542
