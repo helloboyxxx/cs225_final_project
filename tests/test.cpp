@@ -24,14 +24,14 @@ void smallCase(Graph& graph) {
   // 3077,"Hong Kong International Airport","Hong Kong","Hong Kong","HKG","VHHH",22.308901,113.915001,28,8,"U","Asia/Hong_Kong","airport","OurAirports"
   // 3374,"Shenzhen Bao'an International Airport","Shenzhen","China","SZX","ZGSZ",22.639299392700195,113.81099700927734,13,8,"U","Asia/Shanghai","airport","OurAirports"
   // 507,"London Heathrow Airport","London","United Kingdom","LHR","EGLL",51.4706,-0.461941,83,0,"E","Europe/London","airport","OurAirports"
-  Airport a("ORD", "Chicago", "United States", 41.9786, -87.9048, 672);
-  Airport b("LAS", "Las Vegas", "United States", 36.08010101, -115.1520004, 2181);
-  Airport c("SAN", "San Diego", "United States", 32.7336006165,-117.190002441,17);
-  Airport d("MDW", "Chicago", "United States", 41.785999,-87.752403,620);
-  Airport e("BOS", "Boston","United States", 42.36429977,-71.00520325,20);
-  Airport f("HKG", "Hong Kong", "China", 22.308901,113.915001,28);
-  Airport g("SZX", "Shenzhen", "China", 22.639299392700195,113.81099700927734,13);
-  Airport h("LHR", "London", "United Kingdom", 51.4706,-0.461941,83);
+  Airport a(3830, "ORD", "Chicago", "United States", 41.9786, -87.9048);
+  Airport b(3877, "LAS", "Las Vegas", "United States", 36.08010101, -115.1520004);
+  Airport c(3731, "SAN", "San Diego", "United States", 32.7336006165,-117.190002441);
+  Airport d(3747, "MDW", "Chicago", "United States", 41.785999,-87.752403);
+  Airport e(3448, "BOS", "Boston","United States", 42.36429977,-71.00520325);
+  Airport f(3077, "HKG", "Hong Kong", "China", 22.308901,113.915001);
+  Airport g(3374, "SZX", "Shenzhen", "China", 22.639299392700195,113.81099700927734);
+  Airport h(507, "LHR", "London", "United Kingdom", 51.4706,-0.461941);
 
   vector<Airport> airports = {a, b, c, d, e, f, g, h};
   for (Airport& airport : airports) {
@@ -66,7 +66,7 @@ TEST_CASE("Empty graph return proper messages") {
 
 TEST_CASE("Insert a single airport") {
   Graph g;
-  Airport a("ORD", "Chicago", "United States", 41.9786, -87.9048, 672);
+  Airport a(3830, "ORD", "Chicago", "United States", 41.9786, -87.9048);
   g.insertAirport(a);
   REQUIRE(g.getAllAirports().size() == 1);
   REQUIRE(g.getAllAirports().at(0) == "ORD");
@@ -75,17 +75,17 @@ TEST_CASE("Insert a single airport") {
 
 TEST_CASE("Insert and remove one airport") {
   Graph g;
-  Airport a("ORD", "Chicago", "United States", 41.9786, -87.9048, 672);
+  Airport a(3830, "ORD", "Chicago", "United States", 41.9786, -87.9048);
   g.insertAirport(a);
-  g.removeAirport("ORD");
+  g.removeAirport(3830);
   REQUIRE(g.getAllAirports().empty());
   REQUIRE(g.empty());
 }
 
 TEST_CASE("Insert two airports and one edge") {
   Graph g;
-  Airport a("ORD", "Chicago", "United States", 41.9786, -87.9048, 672);
-  Airport b("LAS", "Las Vegas", "United States", 36.08010101, -115.1520004, 2181);
+  Airport a(3830, "ORD", "Chicago", "United States", 41.9786, -87.9048);
+  Airport b(3877, "LAS", "Las Vegas", "United States", 36.08010101, -115.1520004);
 
   double distance = 1;  // formula for calculating distance is required
   REQUIRE(g.getAdjacentAirports("ORD").empty());    // Graph error since airport doesn't exist
@@ -101,21 +101,6 @@ TEST_CASE("Insert two airports and one edge") {
   REQUIRE(g.getAllAirports().size() == 2);
 }
 
-typedef std::pair<double, string> disPair;
-TEST_CASE("Test Distance struct") {
-  std::priority_queue<disPair, vector<disPair>, std::greater<disPair>> Q;
-  
-  Q.push({3, "DEN"});
-  Q.push({1, "ORD"});
-  Q.push({2, "LAS"});
-
-  cout << Q.top().second << ": " << Q.top().first << endl;
-  Q.pop();
-  cout << Q.top().second << ": " << Q.top().first << endl;
-  Q.pop();
-  cout << Q.top().second << ": " << Q.top().first << endl;
-  Q.pop();
-}
 
 TEST_CASE("BFS test 1") {
   Graph empty_graph;

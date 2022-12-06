@@ -1,8 +1,8 @@
 #pragma once
 
-#include <unordered_map>
-#include <string>
 #include <iostream>
+#include <string>
+#include <unordered_map>
 
 const double kInvalidDouble = -114514;
 
@@ -30,9 +30,13 @@ struct Airport {
     */
     Airport() = default;
 
-    Airport(std::string _IATA, std::string _city, std::string _country, double _lo, double _la, double _al) : 
-        IATA(_IATA), city(_city), country(_country), longitude(_lo), latitude(_la), altitude(_al), frequency(0) {}
+    Airport(unsigned _ID, std::string _IATA, std::string _city, std::string _country, double _lo, double _la) : 
+        ID(_ID), IATA(_IATA), city(_city), country(_country), longitude(_lo), latitude(_la) {}
     
+    // airport id. 0 is an invalid id. 
+    unsigned ID = 0;
+
+    // Three letter string
     std::string IATA;
 
     // the city the airport belongs to
@@ -48,7 +52,6 @@ struct Airport {
 
     double longitude = kInvalidDouble;
     double latitude = kInvalidDouble;
-    double altitude = kInvalidDouble;    
 
     // Storing the number of shortest path that passes through this airport
     unsigned frequency = 0;
@@ -56,5 +59,5 @@ struct Airport {
     /**
     * Key: IATA of adjacent airports, value: distance of this route
     */
-    std::unordered_map<std::string, Route> adjacent_airport;
+    std::unordered_map<unsigned, Route> adjacent_airport;
 };
