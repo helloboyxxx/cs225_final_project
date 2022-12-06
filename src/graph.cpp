@@ -191,6 +191,9 @@ vector<string> Graph::shortestPath(string source, string dest) const {
     path.push_back(IDToIATA(prev));
     prev = previous[prev];
   }
+  if (path.size() == 1) {
+    printError("There is not a path from " + source + " to " + dest + ".");
+  }
   // reverse to change the order to (start with source and end with dest)
   std::reverse(path.begin(), path.end());
 
@@ -402,17 +405,6 @@ void Graph::calcFrequency() {
   frequency_updated = true;
   writeFrequency();
 }
-
-std::pair<std::string, unsigned> Graph::getMostImportantAirport() const {
-  if (frequency_updated != true) return std::pair<std::string, unsigned>();
-
-  unsigned ID = frequencies_.begin()->second;
-  unsigned hightest_freq = frequencies_.begin()->first; 
-  string IATA = IDToIATA(ID);
-  cout << "frequencies_ size: " << frequencies_.size() << endl;
-  return std::pair<std::string, unsigned>(IATA, hightest_freq);
-}
-
 
 void Graph::writeFrequency() {
   // Create frequencies

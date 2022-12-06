@@ -105,7 +105,7 @@ class Graph {
     Function will return an empty std::vector if either of source or dest is not 
     included in graph or if dest is the same as source.
     Function will return a std::vector of size one storing the IATA of destination airport 
-    if there is not a path from source to dest.
+    if there is not a path from source to dest. For this case, an error message will also be displayed.
 
     @param source source airport IATA
     @param dest destination airport IATA
@@ -153,7 +153,6 @@ class Graph {
     */
     bool getFrequencyUpdated() const { return frequency_updated; }
 
-    std::pair<std::string, unsigned> getMostImportantAirport() const;
   private:
     // true if the frequencies of the airports is updated 
     bool frequency_updated = false;
