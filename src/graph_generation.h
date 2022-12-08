@@ -1,6 +1,7 @@
 #pragma once
 
 #include "structures.h"
+#include "graph.h"
 #include <iostream>
 #include <fstream>
 #include <string>

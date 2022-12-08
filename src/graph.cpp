@@ -499,3 +499,47 @@ bool Graph::freqExsists() const {
   // freq_filename not exists. 
   return false;
 }
+
+void Graph::generate_Eulerian_Cycle_Graph() {
+  std::vector<std::string> allairports = getAllAirports();
+  for (auto& id : allairports) cycle_graph[id] = {{},{}};
+
+  for (auto& id : allairports) {
+    std::vector<std::string> adj = getAdjacentAirports(id);
+    for (auto& a : adj) {
+      (cycle_graph[id]).first.push_back(IDToAirport(IATAToID(a)));
+      cycle_graph[a].second.push_back(IDToAirport(IATAToID(id)));
+    }
+  }
+
+  for (auto it = cycle_graph.begin(); it != cycle_graph.end(); it++) {
+    if (ID_map_.find(it->first) == ID_map_.end()) {
+      cycle_graph.erase(it++);
+    } else {
+      // bool (Graph::*compareByFreqptr)(const std::string &a, const std::string &b) = NULL;
+      // compareByFreqptr = &Graph::compareByFreq;
+      std::sort(it->second.first.begin(), it->second.first.end(), &Graph::compareByFreq);
+      std::sort(it->second.second.begin(), it->second.second.end(), &Graph::compareByFreq);
+      if (it->second.first.size() == it->second.second.size()) continue;
+      if (it->second.first.size() < it->second.second.size()) {
+        it->second.second.erase(it->second.second.begin()+it->second.first.size(), it->second.second.end());
+      } else {
+        it->second.first.erase(it->second.first.begin()+it->second.second.size(), it->second.first.end());
+      }
+    }
+  }
+  eulerian_cycle_update = true;
+}
+
+void Graph::Eulerian_Cycle(std::string IATA) {
+  //if the Eulerian cycle graph has not yet been generated, do so
+  CycleGraph G = cycle_graph;
+  if (frequency_updated == false) calcFrequency();
+  if (eulerian_cycle_update == false) generate_Eulerian_Cycle_Graph();
+  //this function output MIGHT NOT be void, it is just a place holder
+  // all the set up has been completed
+  // visit https://youtu.be/8MpoO2zA2l4
+  // this is the only thing left to do
+
+}
+

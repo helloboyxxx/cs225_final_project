@@ -61,3 +61,4 @@ struct Airport {
     */
     std::unordered_map<unsigned, Route> adjacent_airport;
 };
+

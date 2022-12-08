@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <map>
 
 /**
  * double distance, unsigned ID.
@@ -21,6 +22,8 @@ typedef std::pair<double, unsigned> disPair;
 typedef std::pair<unsigned, unsigned> freqPair;
 
 const std::string freq_filename = "../allFrequency.txt";
+
+typedef std::unordered_map<std::string, std::pair<std::vector<Airport>, std::vector<Airport>>> CycleGraph;
 
 class Graph {
   public:
@@ -153,7 +156,26 @@ class Graph {
     */
     bool getFrequencyUpdated() const { return frequency_updated; }
 
+    /**
+     * @param IATA the starting and ending airport of the trip
+     * this function generates a possible travel plan that flies to 
+    */
+    void Eulerian_Cycle(std::string IATA);
+
+
+    /**
+     * compare which airport has larger frequency
+    */
+    static bool compareByFreq(const Airport &a, const Airport &b) {
+      return a.frequency > b.frequency;
+    }
+
   private:
+    CycleGraph cycle_graph;
+
+    // true if eulerian cycle is updated
+    bool eulerian_cycle_update = false;
+
     // true if the frequencies of the airports is updated 
     bool frequency_updated = false;
 
@@ -175,9 +197,13 @@ class Graph {
     // Initially empty airport filename, non-empty after constructor
     std::string route_filename_;
 
-    // The following two functions does not check if the argument is valid or not. 
+    // The following three functions does not check if the argument is valid or not. 
     std::string IDToIATA(unsigned ID) const {
       return airport_map_.find(ID)->second.IATA; 
+    }
+    
+    const Airport& IDToAirport(unsigned ID) const {
+      return (airport_map_.find(ID)->second); 
     }
 
     unsigned IATAToID(std::string IATA) const {
@@ -275,5 +301,10 @@ class Graph {
     * (2) the first two lines in that file matches the airport_filename and route_filename. 
     */
     bool freqExsists() const;
+
+    /**
+     * @variable eulerian_graph 
+    */
+    void generate_Eulerian_Cycle_Graph();
 
 };
