@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cfloat>
+#include <filesystem>
 #include <fstream>
 #include <limits>
 #include <queue>
@@ -426,9 +427,15 @@ void Graph::writeFrequency() {
   id_file.open(freq_filename);
   IATA_file.open(IATA_filename);
 
-  // Write filenames 
-  id_file << airport_filename_ << "\n" << route_filename_ << endl;
-  IATA_file << airport_filename_ << "\n" << route_filename_ << endl;
+  // Write filenames IF graph not constructed from files, write invalid_filename
+  if (airport_filename_.empty() || route_filename_.empty()) {
+    id_file << invalid_filename << "\n" << invalid_filename << endl;
+    IATA_file << invalid_filename << "\n" << invalid_filename << endl;
+  }
+  else {
+    id_file << airport_filename_ << "\n" << route_filename_ << endl;
+    IATA_file << airport_filename_ << "\n" << route_filename_ << endl;
+  }
 
   for (const freqPair& freq : frequencies_) {
     id_file << freq.second << "," << freq.first << endl;
@@ -498,4 +505,8 @@ bool Graph::freqExsists() const {
 
   // freq_filename not exists. 
   return false;
+}
+
+void Graph::clearFreqFile() {
+  std::filesystem::remove(freq_filename);
 }

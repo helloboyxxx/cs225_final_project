@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <filesystem>
 
 /**
  * double distance, unsigned ID.
@@ -21,6 +22,7 @@ typedef std::pair<double, unsigned> disPair;
 typedef std::pair<unsigned, unsigned> freqPair;
 
 const std::string freq_filename = "../allFrequency.txt";
+const std::string invalid_filename = "INVALID";
 
 class Graph {
   public:
@@ -146,12 +148,24 @@ class Graph {
     void calcFrequency();
     
     /**
+    * Given airport IATA, return the frequency of this airport
+    */
+    unsigned getFrequency(std::string IATA) const {
+      return airport_map_.find(IATAToID(IATA))->second.frequency;
+    }
+
+    /**
      * This function returns the a boolean representing 
      * the status of the frequencies of airports in the graph.
      * True means that all frequencies has been updated (calcFrequency has been called), 
      * false otherwise.
     */
     bool getFrequencyUpdated() const { return frequency_updated; }
+    
+    /*
+    This function deletes the frequency file where its path is stored in freq_filename
+    */
+    void clearFreqFile();
 
   private:
     // true if the frequencies of the airports is updated 
