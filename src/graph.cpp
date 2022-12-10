@@ -395,34 +395,23 @@ void Graph::calcFrequency() {
   for (const auto& airport : airport_map_) {
     // find the shortest path from 
     calcPrevious(airport.first, previous);
-
-    // // print previous
-    cout << "ORIGIN FROM " << airport.second.IATA << ": " << endl;
-    // for (const auto& prev_pair : previous) {
-    //   cout << "child: " << prev_pair.first << " parent: " << prev_pair.second << endl;
-    // }
-    // cout << endl;
-
-    
-    // loop previous map
-    for (const auto& p : previous) {
-      // increment the corresponding frequency for each airport passed through in a shortest path.
-      if (p.second == 0) {
-        cout << "child: " << IDToIATA(p.first) << " parent: NA" << endl;
-      }
-      else {
-        cout << "child: " << IDToIATA(p.first) << " parent: " << IDToIATA(p.second) << endl;
-      }
-      if (p.second != 0 && p.second != airport.first) {
-        cout << "Adding freq to " << IDToIATA(p.second) << endl;
-        airport_map_[p.second].frequency += 1;
-      }
-    }
+    freqHelper(airport.first, previous);
   }
   frequency_updated = true;
   writeFrequency();
 }
 
+
+void Graph::freqHelper(unsigned source, std::unordered_map<unsigned, unsigned>& previous) {
+  for (const auto& cur_airport : getAllIDs()) {
+    unsigned prev = previous[cur_airport];
+    // prev == 0 when no path exists; prev == source when
+    while (prev != 0 && prev != source) {
+      airport_map_[prev].frequency += 1;
+      prev = previous[prev];
+    }
+  }
+}
 
 unsigned Graph::getFrequency(std::string IATA) const {
   if (frequency_updated == false) {

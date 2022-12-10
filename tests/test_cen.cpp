@@ -162,7 +162,7 @@ TEST_CASE("small case directed", "[part2]") {
   REQUIRE(g.getFrequency("SAN") == 9);
   REQUIRE(g.getFrequency("MDW") == 2);
   REQUIRE(g.getFrequency("BOS") == 5);
-  REQUIRE(g.getFrequency("HKG") == 2);
+  REQUIRE(g.getFrequency("HKG") == 4);
   REQUIRE(g.getFrequency("SZX") == 0);
-  REQUIRE(g.getFrequency("LHR") == 6);
+  REQUIRE(g.getFrequency("LHR") == 5);
 }

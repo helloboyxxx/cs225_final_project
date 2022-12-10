@@ -229,6 +229,12 @@ class Graph {
     */
     void calcPrevious(unsigned source, std::unordered_map<unsigned, unsigned>& previous) const;
 
+    /**
+    * Given the source airport ID where the previous map was calculated, this function will 
+    * add frequencies for all possible internal airports.
+    * e.g undirected graph  A -- B -- C. Given source = C, B would be the internal airport. 
+    */
+    void freqHelper(unsigned source, std::unordered_map<unsigned, unsigned>& previous);
 
 
     /**

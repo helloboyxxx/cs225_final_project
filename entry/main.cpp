@@ -88,22 +88,25 @@ void fiveUndirected(Graph& g) {
 
 int main()
 {
-    // string airport_filename = "../data/airports.txt";
-    // string route_filename = "../data/routes.txt";
-    // Graph mygraph(airport_filename, route_filename);
+    string airport_filename = "../data/airports.txt";
+    string route_filename = "../data/routes.txt";
+    Graph mygraph(airport_filename, route_filename);
     // string source = "ORD";
     // string dest = "SZX";
 
-    // auto start = high_resolution_clock::now();
-    // auto end = high_resolution_clock::now();
-    // auto duration = duration_cast<milliseconds>(end - start);
-    // cout << "Centrality spent: "<< duration.count() << " milliseconds" << endl;
+    auto start = high_resolution_clock::now();
+
+    mygraph.calcFrequency();
+
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end - start);
+    cout << "Centrality spent: "<< duration.count() << " milliseconds" << endl;
 
 
-    Graph g;
-    // fiveUndirected(g);
-    smallCase(g);
-    g.calcFrequency();
+    // Graph g;
+    // // fiveUndirected(g);
+    // smallCase(g);
+    // g.calcFrequency();
     // for (const auto& airport : g.getAllAirports()) {
     //     cout << "STARTING FROM: " << airport << endl;
     //     for (const auto& path : g.allShortestPath(airport)) {
