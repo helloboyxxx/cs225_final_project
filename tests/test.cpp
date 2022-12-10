@@ -334,3 +334,7 @@ TEST_CASE("Test All Shortest Path size") {
   cout << "All airports num: " << mygraph.getAllAirports().size() << endl;
   REQUIRE(short_length == bfs_length);
 }
+
+TEST_CASE("Test Eulerian Path") {
+  
+}
