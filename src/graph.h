@@ -3,6 +3,7 @@
 #include "structures.h"
 
 #include <functional>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -150,9 +151,7 @@ class Graph {
     /**
     * Given airport IATA, return the frequency of this airport
     */
-    unsigned getFrequency(std::string IATA) const {
-      return airport_map_.find(IATAToID(IATA))->second.frequency;
-    }
+    unsigned getFrequency(std::string IATA) const;
 
     /**
      * This function returns the a boolean representing 

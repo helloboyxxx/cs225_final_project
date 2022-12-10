@@ -101,7 +101,9 @@ int main()
 
 
     Graph g;
-    fiveUndirected(g);
+    // fiveUndirected(g);
+    smallCase(g);
+    g.calcFrequency();
     // for (const auto& airport : g.getAllAirports()) {
     //     cout << "STARTING FROM: " << airport << endl;
     //     for (const auto& path : g.allShortestPath(airport)) {
@@ -109,6 +111,9 @@ int main()
     //     }
     //     cout << endl;
     // }
+
+    
+
 
 
     

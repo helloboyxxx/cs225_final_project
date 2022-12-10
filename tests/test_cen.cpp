@@ -96,6 +96,9 @@ TEST_CASE("five directed", "[part2]") {
   g.insertRoute("C", "D", 10);
   g.insertRoute("E", "D", 10);
 
+
+  g.calcFrequency();
+
   REQUIRE(g.getFrequency("A") == 0);
   REQUIRE(g.getFrequency("B") == 1);
   REQUIRE(g.getFrequency("C") == 0);
