@@ -94,32 +94,8 @@ int main()
     // string source = "ORD";
     // string dest = "SZX";
 
-    auto start = high_resolution_clock::now();
-
+    // mygraph.clearFreqFile();
     mygraph.calcFrequency();
-
-    auto end = high_resolution_clock::now();
-    auto duration = duration_cast<milliseconds>(end - start);
-    cout << "Centrality spent: "<< duration.count() << " milliseconds" << endl;
-
-
-    // Graph g;
-    // // fiveUndirected(g);
-    // smallCase(g);
-    // g.calcFrequency();
-    // for (const auto& airport : g.getAllAirports()) {
-    //     cout << "STARTING FROM: " << airport << endl;
-    //     for (const auto& path : g.allShortestPath(airport)) {
-    //         print_vector(path);
-    //     }
-    //     cout << endl;
-    // }
-
-    
-
-
-
-    
 
     return 0;
 }

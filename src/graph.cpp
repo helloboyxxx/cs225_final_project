@@ -14,10 +14,14 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "progressbar.hpp"
+
 using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
+
+/******************** PUBLIC FUNCTIONS BELLOW ********************/
 
 Graph::Graph(string airport_filename, string route_filename)
     : airport_filename_(airport_filename), route_filename_(route_filename) {
@@ -34,31 +38,6 @@ Graph::Graph(string airport_filename, string route_filename)
   }
 }
 
-void Graph::pruneAirports() {
-  for (const unsigned airport : getAllIDs()) {
-    const auto& pair = airport_map_.find(airport);
-    if (pair->second.route_in == 0 || pair->second.route_out == 0) {
-      removeAirport(airport);
-    }
-  }
-}
-
-
-vector<string> Graph::getAllAirports() const {
-  vector<string> airports;
-  for (auto &airport : airport_map_) {
-    airports.push_back(airport.second.IATA);
-  }
-  return airports;
-}
-
-std::vector<unsigned> Graph::getAllIDs() const {
-  vector<unsigned> airports;
-  for (auto &airport : airport_map_) {
-    airports.push_back(airport.first);
-  }
-  return airports;
-}
 
 vector<string> Graph::getAdjacentAirports(string IATA) const {
   if (assertAirportExists(IATA) == false) {
@@ -75,12 +54,14 @@ vector<string> Graph::getAdjacentAirports(string IATA) const {
 }
 
 
-const std::unordered_map<unsigned, Route>& Graph::getAdjacentMap(unsigned ID) const {
-  // if (assertAirportExists(IATA, __func__) == false) {
-  //   throw std::invalid_argument("Invalid argument in getAdjacentAirports");
-  // }
-  return airport_map_.find(ID)->second.adjacent_airport;
+vector<string> Graph::getAllAirports() const {
+  vector<string> airports;
+  for (auto &airport : airport_map_) {
+    airports.push_back(airport.second.IATA);
+  }
+  return airports;
 }
+
 
 double Graph::getDistance(string source, string dest) const {
   if (!assertRouteExists(source, dest)) {
@@ -107,35 +88,13 @@ double Graph::getDistance(string source, string dest) const {
   return dest_it->second.distance;
 }
 
-double Graph::getDistance(unsigned source, unsigned dest) const {
-  const auto& source_it = airport_map_.find(source);   // iterator that points to the source in airport_map
-  // Check if the given sources exists
-  if (source_it == airport_map_.end()) {
-    cout << "The airport " << source << " is not included in the graph." << endl;
-    return -1;
-  } else if (airport_map_.find(dest) == airport_map_.end()) {
-    cout << "The airport " << dest << " is not included in the graph." << endl;
-    return -1;
-  }
-
-  // iterator that points to the dest in the adjacent_airport. Reminder: value is a Route struct
-  const auto& dest_it = source_it->second.adjacent_airport.find(dest); 
-  if (dest_it == source_it->second.adjacent_airport.end()) {
-    cout << "The route from " << source << " to " << dest << " is not included in the graph.";
-    return -1;
-  } 
-
-  // Here we must have a route from source to dest
-  return dest_it->second.distance;
-}
-
-
 
 void Graph::insertAirport(Airport& a) {
   removeAirport(a.ID);    // overwrite old stuff
   airport_map_[a.ID] = a;  // Insert the airport we want
   ID_map_[a.IATA] = a.ID;
 }
+
 
 void Graph::removeAirport(unsigned ID) {
   if (airport_map_.find(ID) != airport_map_.end()) {
@@ -161,6 +120,7 @@ bool Graph::insertRoute(std::string source, std::string dest, double distance) {
   airport_map_[IATAToID(source)].adjacent_airport[IATAToID(dest)] = Route(distance);
   return true;
 }
+
 
 void Graph::removeRoute(unsigned source, unsigned dest) {
   assertRouteExists(source, dest, __func__);
@@ -201,6 +161,7 @@ vector<string> Graph::shortestPath(string source, string dest) const {
   return path;
 }
 
+
 vector<vector<string>> Graph::allShortestPath(string source) const {
   // check if source is included in the graph
   if (ID_map_.find(source) == ID_map_.end()) {
@@ -238,8 +199,180 @@ vector<vector<string>> Graph::allShortestPath(string source) const {
   return to_return;
 }
 
-// Not using priority queue but using set
-// reference: http://nmamano.com/blog/dijkstra/dijkstra.html
+
+void Graph::calcFrequency() {
+  // if we have calculated freq before, read from file
+  if (freqExsists()) {
+    // Output message
+    printReminder("from calcFrequency: ");
+    cout << "Frequency has been calculated before by using \"";
+    cout << airport_filename_ << "\" and \"";
+    cout << route_filename_ << "\"." << endl; 
+    cout << "Now reading from existing file. "; 
+    cout << "Call \"clearFreqFile\" if you want to recalculate." << endl;
+    
+    // Read freq from file
+    readFrequency();
+    return;
+  }
+
+  // Using progressbar here for prettier output
+  cout << "Calculating Betweeness Centrality: " << endl;
+  progressbar bar(airport_map_.size());
+
+  std::unordered_map<unsigned, unsigned> previous;
+  // loop through each airport in the airport map
+  for (const auto& airport : airport_map_) {
+    // find the shortest path from 
+    calcPrevious(airport.first, previous);  // will change previous
+    freqHelper(airport.first, previous);    // Update frequency to graph based on previous
+    bar.update();
+  }
+  cout << endl; // Progress bar ends
+
+  writeFrequency();
+}
+
+
+vector<string> Graph::BFS(string source) const {
+  if (assertAirportExists(source) == false ) {
+    return vector<string>(); 
+  }
+  vector<string> output;
+  std::unordered_set<unsigned> visited;
+  std::queue<unsigned> Q;
+  Q.push(IATAToID(source));
+  visited.emplace(IATAToID(source));
+
+  while( !Q.empty() ) {
+    unsigned cur_airport = Q.front();
+    Q.pop();
+    output.push_back(IDToIATA(cur_airport));
+
+    for (auto adj_pair : getAdjacentMap(cur_airport)) {
+      unsigned a = adj_pair.first;
+      // Not adding visited airport
+      if (visited.find(a) == visited.end()) {
+        Q.emplace(a);
+        visited.emplace(a);
+      }
+    }
+  }
+  return output;
+}
+
+
+bool Graph::assertRouteExists(unsigned source, unsigned dest, string functionName) const {
+  if (assertAirportExists(source, functionName) == false ||
+      assertAirportExists(dest, functionName) == false) {
+        // Let the assertAirportExists report the error message
+        return false;
+  }
+  // std::priority_queue<disPair, vector<disPair>, std::greater<disPair>> Q;
+  const Airport& source_a = airport_map_.find(source)->second;   // source_a is the Airport struct of the given source
+  if (source_a.adjacent_airport.find(dest) == source_a.adjacent_airport.end()) {
+    string message = "The route from " + IDToIATA(source) + " to " + IDToIATA(dest) +
+                     " is not included in the graph. Called by " + functionName;
+    printError(message);
+    return false;
+  }
+  return true;
+}
+
+
+bool Graph::assertAirportExists(unsigned ID, string functionName) const {
+  if (airport_map_.find(ID) == airport_map_.end()) {
+    if (functionName != "") {
+      string message = "The airport " + std::to_string(ID) +
+                       " is not included in the graph. Called by " + functionName;
+      printError(message);
+    }
+    return false;
+  }
+  return true;
+}
+
+
+bool Graph::assertRouteExists(string source, string dest) const {
+  if (assertAirportExists(source) == false ||
+      assertAirportExists(dest) == false) {
+        // Let the assertAirportExists report the error message
+        return false;
+  }
+  const Airport& source_a = airport_map_.find(IATAToID(source))->second;   // source_a is the Airport struct of the given source
+  if (source_a.adjacent_airport.find(IATAToID(dest)) == source_a.adjacent_airport.end()) {
+    string message = "The route from " + source + " to " + dest +
+                 " is not included in the graph.";
+    printError(message);
+    return false;
+  }
+  return true;
+}
+
+
+bool Graph::assertAirportExists(string IATA) const {
+  if (ID_map_.find(IATA) == ID_map_.end()) {
+    string message = "The airport " + IATA +
+                      " is not included in the graph.";
+    printError(message);
+    return false;
+  }
+  return true;
+}
+
+
+/******************** PRIVATE FUNCTIONS BELLOW ********************/
+
+void Graph::pruneAirports() {
+  for (const unsigned airport : getAllIDs()) {
+    const auto& pair = airport_map_.find(airport);
+    if (pair->second.route_in == 0 || pair->second.route_out == 0) {
+      removeAirport(airport);
+    }
+  }
+}
+
+
+std::vector<unsigned> Graph::getAllIDs() const {
+  vector<unsigned> airports;
+  for (auto &airport : airport_map_) {
+    airports.push_back(airport.first);
+  }
+  return airports;
+}
+
+
+const std::unordered_map<unsigned, Route>& Graph::getAdjacentMap(unsigned ID) const {
+  // if (assertAirportExists(IATA, __func__) == false) {
+  //   throw std::invalid_argument("Invalid argument in getAdjacentAirports");
+  // }
+  return airport_map_.find(ID)->second.adjacent_airport;
+}
+
+
+double Graph::getDistance(unsigned source, unsigned dest) const {
+  const auto& source_it = airport_map_.find(source);   // iterator that points to the source in airport_map
+  // Check if the given sources exists
+  if (source_it == airport_map_.end()) {
+    cout << "The airport " << source << " is not included in the graph." << endl;
+    return -1;
+  } else if (airport_map_.find(dest) == airport_map_.end()) {
+    cout << "The airport " << dest << " is not included in the graph." << endl;
+    return -1;
+  }
+
+  // iterator that points to the dest in the adjacent_airport. Reminder: value is a Route struct
+  const auto& dest_it = source_it->second.adjacent_airport.find(dest); 
+  if (dest_it == source_it->second.adjacent_airport.end()) {
+    cout << "The route from " << source << " to " << dest << " is not included in the graph.";
+    return -1;
+  } 
+
+  // Here we must have a route from source to dest
+  return dest_it->second.distance;
+}
+
+
 void Graph::calcPrevious(unsigned source, std::unordered_map<unsigned, unsigned>& previous) const {
   previous.clear();
   // stores airport IATA that has been visited before
@@ -293,132 +426,26 @@ void Graph::calcPrevious(unsigned source, std::unordered_map<unsigned, unsigned>
 }
 
 
-vector<string> Graph::BFS(string source) const {
-  if (assertAirportExists(source) == false ) {
-    return vector<string>(); 
-  }
-  vector<string> output;
-  std::unordered_set<unsigned> visited;
-  std::queue<unsigned> Q;
-  Q.push(IATAToID(source));
-  visited.emplace(IATAToID(source));
-
-  while( !Q.empty() ) {
-    unsigned cur_airport = Q.front();
-    Q.pop();
-    output.push_back(IDToIATA(cur_airport));
-
-    for (auto adj_pair : getAdjacentMap(cur_airport)) {
-      unsigned a = adj_pair.first;
-      // Not adding visited airport
-      if (visited.find(a) == visited.end()) {
-        Q.emplace(a);
-        visited.emplace(a);
-      }
-    }
-  }
-  return output;
-}
-
-bool Graph::assertRouteExists(unsigned source, unsigned dest, string functionName) const {
-  if (assertAirportExists(source, functionName) == false ||
-      assertAirportExists(dest, functionName) == false) {
-        // Let the assertAirportExists report the error message
-        return false;
-  }
-  // std::priority_queue<disPair, vector<disPair>, std::greater<disPair>> Q;
-  const Airport& source_a = airport_map_.find(source)->second;   // source_a is the Airport struct of the given source
-  if (source_a.adjacent_airport.find(dest) == source_a.adjacent_airport.end()) {
-    string message = "The route from " + IDToIATA(source) + " to " + IDToIATA(dest) +
-                     " is not included in the graph. Called by " + functionName;
-    printError(message);
-    return false;
-  }
-  return true;
-}
-
-bool Graph::assertAirportExists(unsigned ID, string functionName) const {
-  if (airport_map_.find(ID) == airport_map_.end()) {
-    if (functionName != "") {
-      string message = "The airport " + std::to_string(ID) +
-                       " is not included in the graph. Called by " + functionName;
-      printError(message);
-    }
-    return false;
-  }
-  return true;
-}
-
-
-bool Graph::assertRouteExists(string source, string dest) const {
-  if (assertAirportExists(source) == false ||
-      assertAirportExists(dest) == false) {
-        // Let the assertAirportExists report the error message
-        return false;
-  }
-  const Airport& source_a = airport_map_.find(IATAToID(source))->second;   // source_a is the Airport struct of the given source
-  if (source_a.adjacent_airport.find(IATAToID(dest)) == source_a.adjacent_airport.end()) {
-    string message = "The route from " + source + " to " + dest +
-                 " is not included in the graph.";
-    printError(message);
-    return false;
-  }
-  return true;
-}
-
-bool Graph::assertAirportExists(string IATA) const {
-  if (ID_map_.find(IATA) == ID_map_.end()) {
-    string message = "The airport " + IATA +
-                      " is not included in the graph.";
-    printError(message);
-    return false;
-  }
-  return true;
-}
-
-void Graph::printError(string message) const
-{
-    std::cerr << "\033[1;31m[Graph Error]\033[0m " + message << endl;
-}
-
-void Graph::calcFrequency() {
-  // Do nothing if we have calculated freq before
-  if ( frequency_updated == true ) return;
-  else if (freqExsists()) {
-    readFrequency();
-    frequency_updated = true;
-    return;
-  }
-  std::unordered_map<unsigned, unsigned> previous;
-
-  // loop through each airport in the airport map
-  for (const auto& airport : airport_map_) {
-    // find the shortest path from 
-    calcPrevious(airport.first, previous);
-    freqHelper(airport.first, previous);
-  }
-  frequency_updated = true;
-  writeFrequency();
-}
-
-
 void Graph::freqHelper(unsigned source, std::unordered_map<unsigned, unsigned>& previous) {
   for (const auto& cur_airport : getAllIDs()) {
     unsigned prev = previous[cur_airport];
-    // prev == 0 when no path exists; prev == source when
+    // Trace the path from destination to source airport
+    // prev == 0 when no path exists; prev == source when path ends
     while (prev != 0 && prev != source) {
-      airport_map_[prev].frequency += 1;
-      prev = previous[prev];
+      airport_map_[prev].frequency += 1;    // Increment centrality score
+      prev = previous[prev];                // keep tracking
     }
   }
 }
 
+
 unsigned Graph::getFrequency(std::string IATA) const {
-  if (frequency_updated == false) {
+  if (freqExsists() == false) {
     throw std::runtime_error("freq not calculated");
   }
   return airport_map_.find(IATAToID(IATA))->second.frequency;
 }
+
 
 void Graph::writeFrequency() {
   // Create frequencies
@@ -458,6 +485,7 @@ void Graph::writeFrequency() {
   IATA_file.close();
 }
 
+
 void Graph::readFrequency() {
   std::ifstream freq_file(freq_filename);
 
@@ -493,6 +521,7 @@ void Graph::readFrequency() {
   }
 }
 
+
 bool Graph::freqExsists() const {
   std::ifstream freq_file(freq_filename);
 
@@ -520,6 +549,18 @@ bool Graph::freqExsists() const {
   return false;
 }
 
+
 void Graph::clearFreqFile() {
   std::filesystem::remove(freq_filename);
+}
+
+
+void Graph::printError(string message) const
+{
+    std::cerr << "\033[1;31m[Graph Error]\033[0m " + message << endl;
+}
+
+
+void Graph::printReminder(string message) const {
+    std::cerr << "\033[1;32m[Reminder]\033[0m " + message << endl;
 }
