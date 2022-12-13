@@ -167,19 +167,6 @@ class Graph {
     void clearFreqFile();
 
     /**
-     * @param IATA the starting and ending airport of the trip
-     * this function generates a possible travel plan that flies to 
-    */
-    void Eulerian_Cycle(std::string IATA);
-
-    /**
-     * compare which airport has larger frequency
-    */
-    static bool compareByFreq(const Airport &a, const Airport &b) {
-      return a.frequency > b.frequency;
-    }
-
-    /**
      * This function returns the round trip details given the source airport's IATA
     */
     void RoundTrip(std::string IATA);
