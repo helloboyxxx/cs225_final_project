@@ -39,38 +39,6 @@ Graph::Graph(string airport_filename, string route_filename)
   }
 }
 
-void Graph::pruneAirports() {
-  for (const unsigned airport : getAllIDs()) {
-    const auto& pair = airport_map_.find(airport);
-    // Check route in and out 
-    if (pair->second.route_in == 0 || pair->second.route_out == 0) {
-      removeAirport(airport);
-    }
-  }
-  for(unsigned airport: getAllIDs()) {
-    if (IDToIATA(airport).size() != 3) {
-      removeAirport(airport);
-    }
-  }
-}
-
-
-vector<string> Graph::getAllAirports() const {
-  vector<string> airports;
-  for (auto &airport : airport_map_) {
-    airports.push_back(airport.second.IATA);
-  }
-  return airports;
-}
-
-std::vector<unsigned> Graph::getAllIDs() const {
-  vector<unsigned> airports;
-  for (auto &airport : airport_map_) {
-    airports.push_back(airport.first);
-  }
-  return airports;
-}
-
 
 vector<string> Graph::getAdjacentAirports(string IATA) const {
   if (assertAirportExists(IATA) == false) {
@@ -564,30 +532,6 @@ bool Graph::freqExsists() const {
   return false;
 }
 
-void Graph::DFS(unsigned ID, std::unordered_set<unsigned>& visited) {
-  if (!assertAirportExists(ID, __func__)) {
-    return;
-  }
-
-  visited.clear();
-  std::stack<unsigned> S;
-  S.push(ID);
-  visited.emplace(ID);
-
-  while( !S.empty() ) {
-    unsigned cur_airport = S.top();
-    S.pop();
-
-    for (auto adj_pair : getAdjacentMap(cur_airport)) {
-      unsigned a = adj_pair.first;
-      // Not adding visited airport
-      if (visited.find(a) == visited.end()) {
-        S.emplace(a);
-        visited.emplace(a);
-      }
-    }
-  }
-}
 
 Cycle_Graph Graph::generateEulerianCycleGraph(std::string IATA) {
   Cycle_Graph G;
@@ -677,9 +621,10 @@ void Graph::RoundTrip(std::string IATA) {
     std::cout<< IDToIATA(i) << " - ";
   }
   std::cout << "End" << std::endl;
+}
 
-void Graph::printError(string message) const
-{
+
+void Graph::printError(string message) const {
     std::cerr << "\033[1;31m[Graph Error]\033[0m " + message << endl;
 }
 
