@@ -319,7 +319,13 @@ void Graph::clearFreqFile() {
 void Graph::pruneAirports() {
   for (const unsigned airport : getAllIDs()) {
     const auto& pair = airport_map_.find(airport);
+    // Check route in and out 
     if (pair->second.route_in == 0 || pair->second.route_out == 0) {
+      removeAirport(airport);
+    }
+  }
+  for(unsigned airport: getAllIDs()) {
+    if (IDToIATA(airport).size() != 3) {
       removeAirport(airport);
     }
   }
@@ -336,9 +342,6 @@ std::vector<unsigned> Graph::getAllIDs() const {
 
 
 const std::unordered_map<unsigned, Route>& Graph::getAdjacentMap(unsigned ID) const {
-  // if (assertAirportExists(IATA, __func__) == false) {
-  //   throw std::invalid_argument("Invalid argument in getAdjacentAirports");
-  // }
   return airport_map_.find(ID)->second.adjacent_airport;
 }
 
