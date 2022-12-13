@@ -1,7 +1,4 @@
-# CS225 Final Project: Open Flights
-
 <h1 align="center">CS225 Final Project: Open Flights</h1>
-
 
 ## Presentation Video
 Please watch on YouTube: https://youtu.be/bvAs_9HUSPo
