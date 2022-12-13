@@ -24,6 +24,8 @@ We are using CMake to complie. If you want to use our test case, please make sur
 
 ### Important functions
 
+We call most of the important functions in `main.cpp` for you. Please modify it if you need.
+
 **shortestPath**: This function returns the results of a specific shortest path calculated by calcPrevious. This function takes a source airport IATA and a destination airport IATA, and returns the shortest path between them as a vector of strings if such a path exists. The result of this function will be an empty vector if either source or destination is not included in the graph. This function will return a vector with only the destination IATA if there is not a path from source to destination to distinguish this situation from the former ones.
 
 **calcFrequency**: "Frequency" here refers to the centrality score in Betweenness centrality Algorithm. It the centrality score for all airports.
