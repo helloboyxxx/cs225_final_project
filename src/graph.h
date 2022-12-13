@@ -49,7 +49,6 @@ class Graph {
      */
     std::vector<std::string> getAllAirports() const;
     
-
     /**
      * Given source and destination airports, if the two airports are directly connected, return the distance
      * Otherwise, return -1.
@@ -60,7 +59,6 @@ class Graph {
      * @returns the distance between two airports.
      */
     double getDistance(std::string source, std::string dest) const;
-
 
     /**
      * Inserts a new airport into the graph.
@@ -75,7 +73,6 @@ class Graph {
      */
     void removeAirport(unsigned IATA);
 
-
     /**
      * Inserts an route between two airports.
      * Hence, an error is not thrown when it fails to insert an route.
@@ -88,14 +85,12 @@ class Graph {
      */
     bool insertRoute(std::string source, std::string dest, double distance);
 
-
     /**
      * Removes the route between two airports
      * @param source - source airport IATA
      * @param dest - destination airport IATA
      */
     void removeRoute(unsigned source, unsigned dest);
-
 
     // Return true if this grpah is empty. 
     bool empty() const { return airport_map_.empty(); }
@@ -173,6 +168,7 @@ class Graph {
 
     // Initially empty airport filename, non-empty after constructor
     std::string airport_filename_;
+
     // Initially empty airport filename, non-empty after constructor
     std::string route_filename_;
 
@@ -199,7 +195,6 @@ class Graph {
      */
     const std::unordered_map<unsigned, Route>& getAdjacentMap(unsigned ID) const;
 
-
     /**
      * Given source and destination airports, if the two airports are directly connected, return the distance
      * Otherwise, return -1.
@@ -225,7 +220,6 @@ class Graph {
      */
     void freqHelper(unsigned source, std::unordered_map<unsigned, unsigned>& previous);
 
-
     /**
      * Returns whether thee route from source to dest exists in the graph
      * @param source - one airport
@@ -233,7 +227,6 @@ class Graph {
      * @param functionName - the name of the calling function to return
      */
     bool assertRouteExists(unsigned source, unsigned dest, std::string functionName) const;
-
 
     /**
      * Returns whether a given airport exists in the graph
@@ -251,7 +244,6 @@ class Graph {
      */
     void writeFrequency();
 
-
     /**
      * Read from freq_filename and construct frequencies_.
      * Should only be called when freqExsists.
@@ -264,7 +256,6 @@ class Graph {
      * (2) the first two lines in that file matches the airport_filename and route_filename. 
      */
     bool freqExsists() const;
-
 
     /**
      * Prints error message with noticeable color
