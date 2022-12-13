@@ -299,5 +299,10 @@ TEST_CASE("Test All Shortest Path size") {
 }
 
 TEST_CASE("Test Eulerian Path") {
-  
+  // string airport_filename = "../data/airports.txt";
+  // string route_filename = "../data/routes.txt";
+  // Graph mygraph(airport_filename, route_filename);
+  // string source = "PVG";
+  // std::unordered_map<std::pair<unsigned, unsigned>, bool, hash_pair> cycleGraph = mygraph.generateEulerianCycleGraph(source);
+  // std::vector<unsigned> path = mygraph.cycleDFS(G, );
 }

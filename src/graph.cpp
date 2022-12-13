@@ -39,38 +39,6 @@ Graph::Graph(string airport_filename, string route_filename)
   }
 }
 
-void Graph::pruneAirports() {
-  for (const unsigned airport : getAllIDs()) {
-    const auto& pair = airport_map_.find(airport);
-    // Check route in and out 
-    if (pair->second.route_in == 0 || pair->second.route_out == 0) {
-      removeAirport(airport);
-    }
-  }
-  for(unsigned airport: getAllIDs()) {
-    if (IDToIATA(airport).size() != 3) {
-      removeAirport(airport);
-    }
-  }
-}
-
-
-vector<string> Graph::getAllAirports() const {
-  vector<string> airports;
-  for (auto &airport : airport_map_) {
-    airports.push_back(airport.second.IATA);
-  }
-  return airports;
-}
-
-std::vector<unsigned> Graph::getAllIDs() const {
-  vector<unsigned> airports;
-  for (auto &airport : airport_map_) {
-    airports.push_back(airport.first);
-  }
-  return airports;
-}
-
 
 vector<string> Graph::getAdjacentAirports(string IATA) const {
   if (assertAirportExists(IATA) == false) {
@@ -564,30 +532,6 @@ bool Graph::freqExsists() const {
   return false;
 }
 
-void Graph::DFS(unsigned ID, std::unordered_set<unsigned>& visited) {
-  if (!assertAirportExists(ID, __func__)) {
-    return;
-  }
-
-  visited.clear();
-  std::stack<unsigned> S;
-  S.push(ID);
-  visited.emplace(ID);
-
-  while( !S.empty() ) {
-    unsigned cur_airport = S.top();
-    S.pop();
-
-    for (auto adj_pair : getAdjacentMap(cur_airport)) {
-      unsigned a = adj_pair.first;
-      // Not adding visited airport
-      if (visited.find(a) == visited.end()) {
-        S.emplace(a);
-        visited.emplace(a);
-      }
-    }
-  }
-}
 
 Cycle_Graph Graph::generateEulerianCycleGraph(std::string IATA) {
   Cycle_Graph G;
@@ -667,19 +611,27 @@ unsigned Graph::hasOtherPath(Cycle_Graph& G, unsigned from, unsigned not_to) {
 
 void Graph::RoundTrip(std::string IATA) {
   Cycle_Graph c = generateEulerianCycleGraph(IATA);
-  for (auto& p : c) {
-    std::cout<< "From: " << IDToIATA(p.first.first) << " ~~~ To: " << IDToIATA(p.first.second) <<std::endl;
-  }
-  std::cout<< " "<<std::endl;
-  std::vector<unsigned> path = cycleDFS(c, IATAToID(IATA));
-  std::cout << "Start: ";
-  for (auto& i : path) {
-    std::cout<< IDToIATA(i) << " - ";
-  }
-  std::cout << "End" << std::endl;
 
-void Graph::printError(string message) const
-{
+  std::vector<unsigned> path = cycleDFS(c, IATAToID(IATA));
+  if (path.size() == 0) {
+    std::cout<<"No trip generated\nTry a different starting airport"<<std::endl;
+    return;
+  }
+  //create file
+  std::ofstream file(roundtrip_filename);
+  file << "Starting Airport: "<< IATA << std::endl;
+  file << "Total number flights in this trip: "<< path.size()<<std::endl;
+  file << IDToIATA(path[0]) << " - " << IDToIATA(path[1]) << std::endl;
+
+  for (size_t i = 1; (i < path.size() - 1) ; i++) {
+    file << IDToIATA(path[i]) << " - " << IDToIATA(path[i+1]) << std::endl;
+  }
+  file.close();
+  std::cout << "Your trip plan has been saved to: RoundTrip.txt" << std::endl;
+}
+
+
+void Graph::printError(string message) const {
     std::cerr << "\033[1;31m[Graph Error]\033[0m " + message << endl;
 }
 
