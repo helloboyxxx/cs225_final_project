@@ -69,5 +69,9 @@ int main()
     // After running calcFrequency, this will return the centrality score of the given airport
     mygraph.getFrequency("ORD");
 
+    // This function returns the round trip details given the source airport's IATA.
+    // Also gives an output text file
+    mygraph.RoundTrip("ORD");
+  
     return 0;
 }
