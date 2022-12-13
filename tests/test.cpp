@@ -288,17 +288,6 @@ TEST_CASE("Test All Shortest Path, all") {
   }
 }
 
-TEST_CASE("Test All Shortest Path size") {
-  string airport_filename = "../data/airports.txt";
-  string route_filename = "../data/routes.txt";
-  Graph mygraph(airport_filename, route_filename);
-  string source = "YYZ";
-  unsigned short_length = mygraph.allShortestPath(source).size();
-  unsigned bfs_length = mygraph.BFS(source).size();
-  cout << "All airports num: " << mygraph.getAllAirports().size() << endl;
-  REQUIRE(short_length == bfs_length);
-}
-
 // Test Eulerian Path
 
 TEST_CASE("Test Eulerian Path", "[part3]") {
@@ -352,9 +341,6 @@ TEST_CASE("Test Eulerian Path-Small", "[part3]") {
   std::unordered_map<std::pair<unsigned, unsigned>, bool, hash_pair> cycleGraph = g.generateEulerianCycleGraph(source);
   REQUIRE(cycleGraph[{555,111}] == false);
   std::vector<unsigned> path = g.cycleDFS(cycleGraph, 222);
-  for (auto& i : path) {
-    std::cout<<i<<std::endl;
-  }
   // one single DFS will walk through the entire graph, but there is no guarantee that every edge been visited
   REQUIRE(path.size() != 9);
   for (unsigned i = 1; i < 6; i++) {
