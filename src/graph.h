@@ -128,14 +128,6 @@ class Graph {
      */
     std::vector<std::vector<std::string>> allShortestPath(std::string source) const;
 
-    /**
-     * This function runs the betweenness centrality algorithm 
-     * which runs through Dijkstra's algorithm for each airport in the airport_map 
-     * and updates the frequency of each airport the times it appears to be in 
-     * the shortest path of other two airports.
-     * This function will also update the frequency_updated to true.
-     */
-    void calcFrequency();
 
     /**
      * Given a starting airport IATA, this function return all the airports' IATA in BFS order.
@@ -146,6 +138,15 @@ class Graph {
 
     bool assertAirportExists(std::string IATA) const;
     
+     /**
+     * This function runs the betweenness centrality algorithm 
+     * which runs through Dijkstra's algorithm for each airport in the airport_map 
+     * and updates the frequency of each airport the times it appears to be in 
+     * the shortest path of other two airports.
+     * This function will also update the frequency_updated to true.
+     */
+    void calcFrequency();
+
     /**
      * Given airport IATA, return the frequency of this airport
      */
@@ -157,6 +158,9 @@ class Graph {
     void clearFreqFile();
 
   private:
+    // true if frequency is calculated; false otherwise
+    bool freq_updated = false;
+
     /**
      * key: airport's ID, value: its corresponding airport struct
      */
@@ -223,21 +227,6 @@ class Graph {
      * e.g undirected graph  A -- B -- C. Given source = C, B would be the internal airport. 
      */
     void freqHelper(unsigned source, std::unordered_map<unsigned, unsigned>& previous);
-
-    /**
-     * Returns whether thee route from source to dest exists in the graph
-     * @param source - one airport
-     * @param dest - another airport
-     * @param functionName - the name of the calling function to return
-     */
-    bool assertRouteExists(unsigned source, unsigned dest, std::string functionName) const;
-
-    /**
-     * Returns whether a given airport exists in the graph
-     * @param ID - ID of an airport
-     * @param functionName - the name of the calling function to return
-     */
-    bool assertAirportExists(unsigned ID, std::string functionName) const;
 
     /**
      * Helper function for calcFrequency. This function will:
