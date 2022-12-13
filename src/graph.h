@@ -146,13 +146,14 @@ class Graph {
 
     bool assertAirportExists(std::string IATA) const;
     
-     /**
+    /**
      * This function runs the betweenness centrality algorithm 
      * which runs through Dijkstra's algorithm for each airport in the airport_map 
      * and updates the frequency of each airport the times it appears to be in 
      * the shortest path of other two airports.
      * This function will also update the frequency_updated to true.
      */
+    
     void calcFrequency();
 
     /**
@@ -171,20 +172,12 @@ class Graph {
     */
     void Eulerian_Cycle(std::string IATA);
 
-
     /**
      * compare which airport has larger frequency
     */
     static bool compareByFreq(const Airport &a, const Airport &b) {
       return a.frequency > b.frequency;
     }
-
-    /*
-    This function, given a starting position and a reference to a set, 
-    runs the DFS traversal and updates the set where all the vertex DFS of 
-    the initial vertex can gets to (including the initial vertex)
-    */
-    void DFS(unsigned ID, std::unordered_set<unsigned>& visited);
 
     /**
      * This function returns the round trip details given the source airport's IATA
