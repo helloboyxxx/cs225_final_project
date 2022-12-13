@@ -62,11 +62,11 @@ We are wondering if we need to write operator++ for BFS.
 ---
 ## **Week 3: (Date: 11/12/22 -- 11/18/22)**
 
-## Weekly Goals
+### Weekly Goals
 
 Complete Dijkstra's Algorithm for finding the shortest path and BFS of the graph. Write the test cases for Dijkstra’s algorithm. Test for the functions of finding the shortest path between airports.
 
-## Specific Tasks Completed (and by who)
+### Specific Tasks Completed (and by who)
 
 Ruijia Lyu: Wrote the function shortestPath and allShortestPath that returns the shortest paths from one airport to another airport/the rest of the airports in the graph based on Dijkstra’s algorithm. Fixed the way to update the priority queue during Dijkstra’s algorithm’s calculation of the shortest path.
 
@@ -89,29 +89,29 @@ Encheng Xie:
 
 2. Eulerian Path code structure starts
 
-## Problems Encountered 
+### Problems Encountered 
 
 We have already implemented all the functions required for calculating shortes paths using Dijkstra's algorithm. Though we have tested it with a few simple and small test cases, we still need to test our functions with real data in the data set. 
 
 While writing the graph generation file of generating a graph from the airport and route files from https://openflights.org/data.html, we realized that some of the airport names in the route file include commas (“,”) which affect the file reading process. We plan to discuss and fix this problem on Sunday (11/20) this week.
 
-## Plans for next week
+### Plans for next week
 
 We will be finishing our testing for shortest path finding functions using data from airports.txt and begin to implement the betweenness centrality algorithm. We will also be fixing the issue with file reading. 
 
-## Optional: Questions for mentor
+### Optional: Questions for mentor
 
 If we have the ability to get the shortest path starting from any point, we can use that to try to calculate the betweenness centrality of our graph. But do we need to use Floyd-Warshall algorithm for calculating all the shortest path for this goal? We are currently using adjacent list for storing, so will this make our algorithm slower?
 
 ---
 ## **Week 4: (Date: 11/19/22 -- 12/02/22)**
 
-## Weekly Goals
+### Weekly Goals
 
 Complete testing for shortest path finding functions using data from airports.txt and route.txt
 Complete betweenness centrality algorithm. 
 
-## Specific Tasks Completed (and by who)
+### Specific Tasks Completed (and by who)
 
 Yue Chen:
 
@@ -138,17 +138,17 @@ Encheng Xie:
 
 Eulerian algorithm started
 
-## Problems Encountered 
+### Problems Encountered 
 
 Small problem: Betweenness centrality takes about 60 seconds to run locally, 90 seconds in the docker container. We don't know if this is a normal speed for these dataset. Currently our time complexity of betweenness centrality is:
 $$O(mn*log(n) + n^2 *log(n) + n^2), n = |V|, m = |E|, m > n.$$ So leading term is $$O(mn*log(n))$$
 
 
-## Plans for next week
+### Plans for next week
 
 We will finish writing test cases for betweenness centrality algorithms and complete implementing the multi-cities round trip using Eulerian path. We will also be starting working on the final project deliverables.
 
  
-## Optional: Questions for mentor
+### Optional: Questions for mentor
 
 Is the complexity in the "problems encountered" section acceptable?
