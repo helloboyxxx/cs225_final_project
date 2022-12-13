@@ -28,7 +28,7 @@ We are using CMake to complie. If you want to use our test case, please make sur
 
 **calcFrequency**: "Frequency" here refers to the centrality score in Betweenness centrality Algorithm. It the centrality score for all airports.
 
-**RoundTrip**: 
+**RoundTrip**: Takes an IATA of the starting trip airport (as string), generates file (RoundTrip.txt) that contains a travel plan which would eventually to the starting place. This function is slow, and will take a while, so be patient please.
 
 ## Team Members
 * Ellen Yang (`yaweny2`)
