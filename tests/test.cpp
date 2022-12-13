@@ -1,5 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <functional>
 #include <queue>
@@ -284,5 +285,79 @@ TEST_CASE("Test All Shortest Path, all") {
   auto posE = shortest_paths.find(e);
   if (posE == shortest_paths.end()) {
     std::cout << "ORD-ATH Not Present" << std::endl;
+  }
+}
+
+TEST_CASE("Test All Shortest Path size") {
+  string airport_filename = "../data/airports.txt";
+  string route_filename = "../data/routes.txt";
+  Graph mygraph(airport_filename, route_filename);
+  string source = "YYZ";
+  unsigned short_length = mygraph.allShortestPath(source).size();
+  unsigned bfs_length = mygraph.BFS(source).size();
+  cout << "All airports num: " << mygraph.getAllAirports().size() << endl;
+  REQUIRE(short_length == bfs_length);
+}
+
+// Test Eulerian Path
+
+TEST_CASE("Test Eulerian Path", "[part3]") {
+  string airport_filename = "../data/airports.txt";
+  string route_filename = "../data/routes.txt";
+  Graph mygraph(airport_filename, route_filename);
+  string source = "ORD";
+  std::unordered_map<std::pair<unsigned, unsigned>, bool, hash_pair> cycleGraph = mygraph.generateEulerianCycleGraph(source);
+  std::vector<unsigned> path = mygraph.cycleDFS(cycleGraph, 3830);
+  REQUIRE(path.size() % 2 == 0);
+  //this is about a perfect case (starting from O'Hare Int'l Airport, the one time DFS returns to the starting place)
+  REQUIRE(path[0] == path[path.size() - 1]);
+}
+
+TEST_CASE("Test Eulerian Path-Small", "[part3]") {
+  Graph g;
+  Airport a(111, "A", "Chicago", "United States", 41.9786, -87.9048);
+  Airport b(222, "B", "Las Vegas", "United States", 36.08010101, -115.1520004);
+  Airport c(333, "C", "San Diego", "United States", 32.7336006165,-117.190002441);
+  Airport d(444, "D", "Boston","United States", 42.36429977,-71.00520325);
+  Airport e(555, "E", "London", "United Kingdom", 51.4706,-0.461941);
+
+  g.insertAirport(a);
+  g.insertAirport(b);
+  g.insertAirport(c);
+  g.insertAirport(d);
+  g.insertAirport(e);
+
+  // a - b
+  g.insertRoute("A", "B", 1);
+  g.insertRoute("B", "A", 1);
+
+  // b - c
+  g.insertRoute("B", "C", 1);
+  g.insertRoute("C", "B", 1);
+  
+  // c - d
+  g.insertRoute("C", "D", 1);
+  g.insertRoute("D", "C", 1);
+
+  // d - e
+  g.insertRoute("D", "E", 1);
+  g.insertRoute("E", "D", 1);
+
+  // e - a
+  g.insertRoute("E", "A", 1);
+
+  g.RoundTrip("B");
+
+  string source = "B";
+  std::unordered_map<std::pair<unsigned, unsigned>, bool, hash_pair> cycleGraph = g.generateEulerianCycleGraph(source);
+  REQUIRE(cycleGraph[{555,111}] == false);
+  std::vector<unsigned> path = g.cycleDFS(cycleGraph, 222);
+  for (auto& i : path) {
+    std::cout<<i<<std::endl;
+  }
+  // one single DFS will walk through the entire graph, but there is no guarantee that every edge been visited
+  REQUIRE(path.size() != 9);
+  for (unsigned i = 1; i < 6; i++) {
+    REQUIRE(std::find(path.begin(), path.end(), 111*i) != path.end());
   }
 }

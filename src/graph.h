@@ -10,6 +10,8 @@
 #include <vector>
 #include <set>
 
+#include <fstream>
+#include <iostream>
 #include <map>
 #include <filesystem>
 
@@ -32,6 +34,8 @@ const std::string freq_filename = "../allFrequency.txt";
 typedef std::unordered_map<std::pair<unsigned, unsigned>, bool, hash_pair> Cycle_Graph;
 const std::string IATA_filename = "../allFrequency_IATA.txt";
 const std::string invalid_filename = "INVALID";
+const std::string roundtrip_filename = "../RoundTrip.txt";
+
 
 class Graph {
   public:
@@ -167,6 +171,22 @@ class Graph {
     */
     void RoundTrip(std::string IATA);
 
+    /**
+    * Hierholzer's Algorithm
+    * @param G  Cycle_Graph
+    * @param start starting aiport's id
+    * @return vectors of airports's id
+    */
+    std::vector<unsigned> cycleDFS(Cycle_Graph& G, unsigned start);
+
+    /**
+     * Each trip can be deemed as round trip
+     * if A->B exists, then B->A also exists 
+     * @param IATA the starting airport of the trip
+     * @return Generates a Strong connected airport graph which:
+     */
+    Cycle_Graph generateEulerianCycleGraph(std::string IATA);
+    
   private:
     // true if frequency is calculated; false otherwise
     bool freq_updated = false;
@@ -275,15 +295,6 @@ class Graph {
      * @param message - the message that should be printed
      */
     void printReminder(std::string message) const;
-
-
-    /**
-     * Each trip can be deemed as round trip
-     * if A->B exists, then B->A also exists 
-     * @param IATA the starting airport of the trip
-     * @return Generates a Strong connected airport graph which:
-     */
-    Cycle_Graph generateEulerianCycleGraph(std::string IATA);
   
     /**
      * helper function of generateEulerianCycleGraph
@@ -296,14 +307,6 @@ class Graph {
      * @return when des->adj exists, True when adj->des also exists
      */
     bool isTwoWay(const unsigned adj, unsigned des) const;
-
-    /**
-    * Hierholzer's Algorithm
-    * @param G  Cycle_Graph
-    * @param start starting aiport's id
-    * @return vectors of airports's id
-    */
-    std::vector<unsigned> cycleDFS(Cycle_Graph& G, unsigned start);
   
     /**
     * DFS for the fleury algorithm

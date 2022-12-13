@@ -614,16 +614,23 @@ unsigned Graph::hasOtherPath(Cycle_Graph& G, unsigned from, unsigned not_to) {
 
 void Graph::RoundTrip(std::string IATA) {
   Cycle_Graph c = generateEulerianCycleGraph(IATA);
-  for (auto& p : c) {
-    std::cout<< "From: " << IDToIATA(p.first.first) << " ~~~ To: " << IDToIATA(p.first.second) <<std::endl;
-  }
-  std::cout<< " "<<std::endl;
+
   std::vector<unsigned> path = cycleDFS(c, IATAToID(IATA));
-  std::cout << "Start: ";
-  for (auto& i : path) {
-    std::cout<< IDToIATA(i) << " - ";
+  if (path.size() == 0) {
+    std::cout<<"No trip generated\nTry a different starting airport"<<std::endl;
+    return;
   }
-  std::cout << "End" << std::endl;
+  //create file
+  std::ofstream file(roundtrip_filename);
+  file << "Starting Airport: "<< IATA << std::endl;
+  file << "Total number flights in this trip: "<< path.size()<<std::endl;
+  file << IDToIATA(path[0]) << " - " << IDToIATA(path[1]) << std::endl;
+
+  for (size_t i = 1; (i < path.size() - 1) ; i++) {
+    file << IDToIATA(path[i]) << " - " << IDToIATA(path[i+1]) << std::endl;
+  }
+  file.close();
+  std::cout << "Your trip plan has been saved to: RoundTrip.txt" << std::endl;
 }
 
 
