@@ -1,5 +1,6 @@
 # CS225 Final Project: Open Flights
-UIUC fall 2023 cs225 final project repository
+
+<h1 align="center">CS225 Final Project: Open Flights</h1>
 
 
 ## Presentation Video
@@ -16,7 +17,7 @@ We are using the Airport database and Route database from OpenFlights' dataset c
 ## Running Instructions
 
 ## Team Members
-* Ellen Yang (`yaweny`)
+* Ellen Yang (`yaweny2`)
 * Encheng Xie (`encheng2`) 
 * Ruijia Lyu (`ruijial3`)
 * Yue Chen (`yuec12`)
