@@ -123,7 +123,13 @@ bool Graph::insertRoute(std::string source, std::string dest, double distance) {
 
 
 void Graph::removeRoute(unsigned source, unsigned dest) {
-  assertRouteExists(source, dest, __func__);
+  // check if both source and dest are included in the graph
+  if (airport_map_.find(source) == airport_map_.end() ||
+    airport_map_.find(dest) == airport_map_.end()) 
+  { 
+      return;
+  }
+
   airport_map_[source].adjacent_airport.erase(dest);
 }
 
@@ -200,40 +206,6 @@ vector<vector<string>> Graph::allShortestPath(string source) const {
 }
 
 
-void Graph::calcFrequency() {
-  // if we have calculated freq before, read from file
-  if (freqExsists()) {
-    // Output message
-    printReminder("from calcFrequency: ");
-    cout << "Frequency has been calculated before by using \"";
-    cout << airport_filename_ << "\" and \"";
-    cout << route_filename_ << "\"." << endl; 
-    cout << "Now reading from existing file. "; 
-    cout << "Call \"clearFreqFile\" if you want to recalculate." << endl;
-    
-    // Read freq from file
-    readFrequency();
-    return;
-  }
-
-  // Using progressbar here for prettier output
-  cout << "Calculating Betweeness Centrality: " << endl;
-  progressbar bar(airport_map_.size());
-
-  std::unordered_map<unsigned, unsigned> previous;
-  // loop through each airport in the airport map
-  for (const auto& airport : airport_map_) {
-    // find the shortest path from 
-    calcPrevious(airport.first, previous);  // will change previous
-    freqHelper(airport.first, previous);    // Update frequency to graph based on previous
-    bar.update();
-  }
-  cout << endl; // Progress bar ends
-
-  writeFrequency();
-}
-
-
 vector<string> Graph::BFS(string source) const {
   if (assertAirportExists(source) == false ) {
     return vector<string>(); 
@@ -259,37 +231,6 @@ vector<string> Graph::BFS(string source) const {
     }
   }
   return output;
-}
-
-
-bool Graph::assertRouteExists(unsigned source, unsigned dest, string functionName) const {
-  if (assertAirportExists(source, functionName) == false ||
-      assertAirportExists(dest, functionName) == false) {
-        // Let the assertAirportExists report the error message
-        return false;
-  }
-  // std::priority_queue<disPair, vector<disPair>, std::greater<disPair>> Q;
-  const Airport& source_a = airport_map_.find(source)->second;   // source_a is the Airport struct of the given source
-  if (source_a.adjacent_airport.find(dest) == source_a.adjacent_airport.end()) {
-    string message = "The route from " + IDToIATA(source) + " to " + IDToIATA(dest) +
-                     " is not included in the graph. Called by " + functionName;
-    printError(message);
-    return false;
-  }
-  return true;
-}
-
-
-bool Graph::assertAirportExists(unsigned ID, string functionName) const {
-  if (airport_map_.find(ID) == airport_map_.end()) {
-    if (functionName != "") {
-      string message = "The airport " + std::to_string(ID) +
-                       " is not included in the graph. Called by " + functionName;
-      printError(message);
-    }
-    return false;
-  }
-  return true;
 }
 
 
@@ -320,6 +261,57 @@ bool Graph::assertAirportExists(string IATA) const {
   return true;
 }
 
+
+void Graph::calcFrequency() {
+  // if we have calculated freq before, read from file
+  if (freq_updated) {
+    return; 
+  }
+  else if (freqExsists()) {
+    // Output message
+    printReminder("from calcFrequency: ");
+    cout << "Frequency has been calculated before by using \"";
+    cout << airport_filename_ << "\" and \"";
+    cout << route_filename_ << "\"." << endl; 
+    cout << "Now reading from existing file. "; 
+    cout << "Call \"clearFreqFile\" if you want to recalculate." << endl;
+    
+    // Read freq from file
+    readFrequency();
+    return;
+  }
+
+  // Using progressbar here for prettier output
+  cout << "Calculating Betweeness Centrality: " << endl;
+  progressbar bar(airport_map_.size());
+
+  std::unordered_map<unsigned, unsigned> previous;
+  // loop through each airport in the airport map
+  for (const auto& airport : airport_map_) {
+    // find the shortest path from 
+    calcPrevious(airport.first, previous);  // will change previous
+    freqHelper(airport.first, previous);    // Update frequency to graph based on previous
+    bar.update();
+  }
+  cout << endl; // Progress bar ends
+  writeFrequency();
+  freq_updated = true;
+}
+
+
+unsigned Graph::getFrequency(std::string IATA) const {
+  if (freq_updated == false) {
+    throw std::runtime_error("freq not calculated");
+  }
+  return airport_map_.find(IATAToID(IATA))->second.frequency;
+}
+
+
+void Graph::clearFreqFile() {
+  freq_updated = false;
+  std::filesystem::remove(freq_filename);
+  std::filesystem::remove(IATA_filename);
+}
 
 /******************** PRIVATE FUNCTIONS BELLOW ********************/
 
@@ -439,14 +431,6 @@ void Graph::freqHelper(unsigned source, std::unordered_map<unsigned, unsigned>& 
 }
 
 
-unsigned Graph::getFrequency(std::string IATA) const {
-  if (freqExsists() == false) {
-    throw std::runtime_error("freq not calculated");
-  }
-  return airport_map_.find(IATAToID(IATA))->second.frequency;
-}
-
-
 void Graph::writeFrequency() {
   // Create frequencies
   frequencies_.clear();
@@ -545,11 +529,6 @@ bool Graph::freqExsists() const {
 
   // freq_filename not exists. 
   return false;
-}
-
-
-void Graph::clearFreqFile() {
-  std::filesystem::remove(freq_filename);
 }
 
 
