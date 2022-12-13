@@ -25,6 +25,9 @@ typedef std::pair<unsigned, unsigned> freqPair;
 const std::string freq_filename = "../allFrequency.txt";
 const std::string invalid_filename = "INVALID";
 
+/**
+ * 
+ */
 typedef std::unordered_map<std::pair<unsigned, unsigned>, bool, hash_pair> Cycle_Graph;
 
 class Graph {
@@ -172,14 +175,17 @@ class Graph {
       return a.frequency > b.frequency;
     }
 
-  /*
-  This function, given a starting position and a reference to a set, 
-  runs the DFS traversal and updates the set where all the vertex DFS of 
-  the initial vertex can gets to (including the initial vertex)
-  */
-  void DFS(unsigned ID, std::unordered_set<unsigned>& visited);
+    /*
+    This function, given a starting position and a reference to a set, 
+    runs the DFS traversal and updates the set where all the vertex DFS of 
+    the initial vertex can gets to (including the initial vertex)
+    */
+    void DFS(unsigned ID, std::unordered_set<unsigned>& visited);
 
-  void RoundTrip(std::string IATA);
+    /**
+     * This function returns the round trip details given the source airport's IATA
+    */
+    void RoundTrip(std::string IATA);
 
   private:
 
@@ -310,44 +316,41 @@ class Graph {
     bool freqExsists() const;
 
     /**
-     * @param IATA the starting airport of the trip
-     * @return Generates a Strong connected airport graph which:
      * Each trip can be deemed as round trip
      * if A->B exists, then B->A also exists 
+     * @param IATA the starting airport of the trip
+     * @return Generates a Strong connected airport graph which:
      */
-    Cycle_Graph generate_Eulerian_Cycle_Graph(std::string IATA);
+    Cycle_Graph generateEulerianCycleGraph(std::string IATA);
+  
     /**
-     * helper function of generate_Eulerian_Cycle_Graph
+     * helper function of generateEulerianCycleGraph
      */
-    void generate_Eulerian_Cycle_Graph(unsigned id, Cycle_Graph& G) const;
+    void generateEulerianCycleGraph(unsigned id, Cycle_Graph& G) const;
+
     /**
      * @param adj airport-id of the adjcent airport
      * @param des airport-id of the starting airport
      * @return when des->adj exists, True when adj->des also exists
      */
-    bool is_two_way(const unsigned adj, unsigned des) const;
-
-
+    bool isTwoWay(const unsigned adj, unsigned des) const;
 
     /**
-    * This function will return true if the current airport is a valid starting vertex of the eulerian path.
+    * Hierholzer's Algorithm
+    * @param G  Cycle_Graph
+    * @param start starting aiport's id
+    * @return vectors of airports's id
     */
-    bool validStartingVertex(std::string IATA, Cycle_Graph& G);
-
+    std::vector<unsigned> cycleDFS(Cycle_Graph& G, unsigned start);
+  
     /**
-    * This function will return true when the source aiport and dest airport is forming bridge. 
+    * DFS for the fleury algorithm
     */
-    bool isBridge(unsigned from, unsigned to, Cycle_Graph& G);
-
+    void cycleDFS(Cycle_Graph& G, unsigned current_airport, std::vector<unsigned>& path, size_t num_total_path);
+  
     /**
-    * Fleury Algorithm 
+    * Helper function for Hieholzer's Algorithm
     */
-    // void fleuryAlgorithm(std::string IATA);
+    unsigned hasOtherPath(Cycle_Graph& G, unsigned from, unsigned not_to);
 
-    std::vector<unsigned> cycle_DFS(Cycle_Graph& G, unsigned start);
-    void cycle_DFS(Cycle_Graph& G, unsigned current_airport, std::vector<unsigned>& path, size_t num_total_path);
-    unsigned has_other_path(Cycle_Graph& G, unsigned from, unsigned not_to);
-
-    // void dfs(unsigned start, std::vector<unsigned>& visited, Cycle_Graph& G);
-    // bool checkRoute(unsigned to, unsigned from, std::vector<unsigned>& visited, Cycle_Graph& G);
 };

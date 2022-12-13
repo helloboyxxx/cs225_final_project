@@ -37,7 +37,7 @@ struct Airport {
     unsigned ID = 0;
 
     // Three letter string
-    std::string IATA = "INVALID";
+    std::string IATA;
 
     // the city the airport belongs to
     std::string city;
@@ -74,6 +74,6 @@ struct hash_pair {
         }
          
         // If hash1 == hash2, their XOR is zero.
-          return hash1;
+        return hash1;
     }
 };

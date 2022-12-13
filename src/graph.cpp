@@ -510,51 +510,6 @@ bool Graph::freqExsists() const {
   return false;
 }
 
-/*
-void Graph::generate_Eulerian_Cycle_Graph() {
-  std::vector<std::string> allairports = getAllAirports();
-  for (auto& id : allairports) cycle_graph[id] = {{},{}};
-
-  for (auto& id : allairports) {
-    std::vector<std::string> adj = getAdjacentAirports(id);
-    for (auto& a : adj) {
-      (cycle_graph[id]).first.push_back(IDToAirport(IATAToID(a)));
-      cycle_graph[a].second.push_back(IDToAirport(IATAToID(id)));
-    }
-  }
-
-  for (auto it = cycle_graph.begin(); it != cycle_graph.end(); it++) {
-    if (ID_map_.find(it->first) == ID_map_.end()) {
-      cycle_graph.erase(it++);
-    } else {
-      // bool (Graph::*compareByFreqptr)(const std::string &a, const std::string &b) = NULL;
-      // compareByFreqptr = &Graph::compareByFreq;
-      std::sort(it->second.first.begin(), it->second.first.end(), &Graph::compareByFreq);
-      std::sort(it->second.second.begin(), it->second.second.end(), &Graph::compareByFreq);
-      if (it->second.first.size() == it->second.second.size()) continue;
-      if (it->second.first.size() < it->second.second.size()) {
-        it->second.second.erase(it->second.second.begin()+it->second.first.size(), it->second.second.end());
-      } else {
-        it->second.first.erase(it->second.first.begin()+it->second.second.size(), it->second.first.end());
-      }
-    }
-  }
-  eulerian_cycle_update = true;
-}
-
-void Graph::Eulerian_Cycle(std::string IATA) {
-  //if the Eulerian cycle graph has not yet been generated, do so
-  CycleGraph G = cycle_graph;
-  if (frequency_updated == false) calcFrequency();
-  if (eulerian_cycle_update == false) generate_Eulerian_Cycle_Graph();
-  //this function output MIGHT NOT be void, it is just a place holder
-  // all the set up has been completed
-  // visit https://youtu.be/8MpoO2zA2l4
-  // this is the only thing left to do
-
-}
-*/
-
 void Graph::DFS(unsigned ID, std::unordered_set<unsigned>& visited) {
   if (!assertAirportExists(ID, __func__)) {
     return;
@@ -580,41 +535,41 @@ void Graph::DFS(unsigned ID, std::unordered_set<unsigned>& visited) {
   }
 }
 
-Cycle_Graph Graph::generate_Eulerian_Cycle_Graph(std::string IATA) {
+Cycle_Graph Graph::generateEulerianCycleGraph(std::string IATA) {
   Cycle_Graph G;
 
   unsigned id = IATAToID(IATA);
-  generate_Eulerian_Cycle_Graph(id, G);
+  generateEulerianCycleGraph(id, G);
   return G;
 }
 
-void Graph::generate_Eulerian_Cycle_Graph(unsigned id, Cycle_Graph& G) const {
+void Graph::generateEulerianCycleGraph(unsigned id, Cycle_Graph& G) const {
   std::unordered_map<unsigned, Route> adjs = getAdjacentMap(id);
 
   for (const auto& adj : adjs) {
     if (G.find({id, adj.first}) != G.end()) continue;
-    if (is_two_way(adj.first, id)) {
+    if (isTwoWay(adj.first, id)) {
       G[{id, adj.first}] = false;
       G[{adj.first, id}] = false;
-      generate_Eulerian_Cycle_Graph(adj.first, G);
+      generateEulerianCycleGraph(adj.first, G);
     }
   }
 }
 
-bool Graph::is_two_way(const unsigned adj, unsigned des) const {
+bool Graph::isTwoWay(const unsigned adj, unsigned des) const {
   std::unordered_map<unsigned, Route> adjs = getAdjacentMap(adj);
   return (adjs.find(des) != adjs.end());
 }
 
 
-std::vector<unsigned> Graph::cycle_DFS(Cycle_Graph& G, unsigned start) {
+std::vector<unsigned> Graph::cycleDFS(Cycle_Graph& G, unsigned start) {
     std::vector<unsigned> path;
     path.push_back(start);
-    cycle_DFS(G, start, path, G.size());
+    cycleDFS(G, start, path, G.size());
     return path;
 }
 
-void Graph::cycle_DFS(Cycle_Graph& G, unsigned current_airport, std::vector<unsigned>& path, size_t num_total_path) {
+void Graph::cycleDFS(Cycle_Graph& G, unsigned current_airport, std::vector<unsigned>& path, size_t num_total_path) {
     for (auto& p : G) {
         //if this route has already been visited
         if (p.second == true) continue;
@@ -623,7 +578,7 @@ void Graph::cycle_DFS(Cycle_Graph& G, unsigned current_airport, std::vector<unsi
         G[p.first] = true;
         path.push_back(p.first.second);
         // std::cout<<" "<<IDToIATA(path.back())<<" "<<std::endl;
-        cycle_DFS(G, p.first.second, path, num_total_path);
+        cycleDFS(G, p.first.second, path, num_total_path);
         break;
     }
     //after the loop, if path has size equal to num_total_path
@@ -638,15 +593,15 @@ void Graph::cycle_DFS(Cycle_Graph& G, unsigned current_airport, std::vector<unsi
       path.pop_back();
       from = path.back();
       G[{from, not_to}] = false;
-      to = has_other_path(G, from, not_to);
+      to = hasOtherPath(G, from, not_to);
       if (to != 0) break;
     }
     G[{from, to}] = true;
     path.push_back(to);
-    cycle_DFS(G, to, path, num_total_path);
+    cycleDFS(G, to, path, num_total_path);
 }
 
-unsigned Graph::has_other_path(Cycle_Graph& G, unsigned from, unsigned not_to) {
+unsigned Graph::hasOtherPath(Cycle_Graph& G, unsigned from, unsigned not_to) {
   for (auto& p : G) {
     if (p.second == true) continue;
     if (p.first.first != from) continue;
@@ -656,61 +611,16 @@ unsigned Graph::has_other_path(Cycle_Graph& G, unsigned from, unsigned not_to) {
   return 0;
 }
 
-/*
-std::vector<unsigned> Graph::cycle_DFS(Cycle_Graph& G, unsigned start) {
-    std::vector<unsigned> path;
-    path.push_back(start);
-    dfs(start, path, G);
-    return path;
-}
-
-void Graph::dfs(unsigned start, std::vector<unsigned>& visited, Cycle_Graph& G) {
-    for (auto& edge : G) {
-        if (edge.first.first == start) {
-            G[{start, edge.first.second}] = true;
-            visited.push_back(edge.first.second);
-            dfs(edge.first.second, visited, G);
-        }
-    }
-
-    if (visited.size() == G.size() - 1) {
-        return;
-    } else {
-        // backtrack
-        for (int i = visited.size() - 1; i > -1; i--) {
-            if(checkRoute(visited[i], visited[i - 1], visited, G) == true) {
-              unsigned curr = visited.back();
-              dfs(curr, visited, G);
-            }
-        }
-    }
-}
-
-// if there exists other unvisited route
-bool Graph::checkRoute(unsigned to, unsigned from, std::vector<unsigned>& visited, Cycle_Graph& G) {
-    for (auto& edge : G) {
-        // if (edge.first.first == from && edge.first.second == to) continue;
-        if (edge.first.first == from && edge.first.second != to && edge.second == false) {
-            visited.pop_back();
-            G[{from, to}] = false;
-            G[{from, edge.first.second}] = true;
-            visited.push_back(edge.first.second);
-            return true;
-        }
-    }
-    return false;
-}
-*/
-
 void Graph::RoundTrip(std::string IATA) {
-  Cycle_Graph c = generate_Eulerian_Cycle_Graph(IATA);
+  Cycle_Graph c = generateEulerianCycleGraph(IATA);
   for (auto& p : c) {
-    std::cout<<"From: "<< IDToIATA(p.first.first) <<" ~~~ To: "<< IDToIATA(p.first.second) <<std::endl;
+    std::cout<< "From: " << IDToIATA(p.first.first) << " ~~~ To: " << IDToIATA(p.first.second) <<std::endl;
   }
-  std::cout<<""<<std::endl;
-  std::vector<unsigned> path = cycle_DFS(c, IATAToID(IATA));
+  std::cout<< " "<<std::endl;
+  std::vector<unsigned> path = cycleDFS(c, IATAToID(IATA));
+  std::cout << "Start: ";
   for (auto& i : path) {
-    std::cout<<IDToIATA(i)<<" - ";
+    std::cout<< IDToIATA(i) << " - ";
   }
-  std::cout << '\n';
+  std::cout << "End" << std::endl;
 }
