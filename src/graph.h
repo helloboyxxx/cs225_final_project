@@ -18,11 +18,15 @@
 typedef std::pair<double, unsigned> disPair;
 
 /**
-* unsigned frequency, unsigned airport ID
-*/
+ * unsigned frequency, unsigned airport ID
+ * Used in frequencies_
+ */
 typedef std::pair<unsigned, unsigned> freqPair;
 
+// These two file names will be used as output filename of writeFrequency
 const std::string freq_filename = "../allFrequency.txt";
+const std::string IATA_filename = "../allFrequency_IATA.txt";
+
 const std::string invalid_filename = "INVALID";
 
 class Graph {

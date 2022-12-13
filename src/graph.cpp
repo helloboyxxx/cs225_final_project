@@ -460,8 +460,6 @@ void Graph::writeFrequency() {
 
 
   // Write from frequencies to file
-  std::string IATA_filename = "../allFrequency_IATA.txt";    // A little hardcoding 
-
   std::ofstream id_file;
   std::ofstream IATA_file;
   id_file.open(freq_filename);
